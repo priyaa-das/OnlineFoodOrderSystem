@@ -149,7 +149,7 @@ if(foodList != null && !foodList.isEmpty()){
             <%=food.getDescription()%>
         </p>
 
-        <form action="AddToCartServlet"
+        <form action="<%=request.getContextPath()%>/AddToCartServlet"
               method="post">
 
             <input type="hidden"

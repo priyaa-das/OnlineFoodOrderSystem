@@ -251,7 +251,7 @@ if(cartList != null && !cartList.isEmpty()){
 
         </a>
 
-        <a href="checkout.jsp"
+        <a href="<%=request.getContextPath()%>/CheckoutServlet"
            class="primary-btn">
 
             Proceed to Checkout

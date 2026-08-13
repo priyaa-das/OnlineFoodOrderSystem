@@ -29,19 +29,14 @@
 
     <dependencies>
 
-        <!-- Jakarta EE -->
+        <!-- jakarta EE -->
 
-        <dependency>
-
-            <groupId>jakarta.platform</groupId>
-
-            <artifactId>jakarta.jakartaee-web-api</artifactId>
-
-            <version>10.0.0</version>
-
-            <scope>provided</scope>
-
-        </dependency>
+       <dependency>
+    <groupId>javax.servlet</groupId>
+    <artifactId>javax.servlet-api</artifactId>
+    <version>4.0.1</version>
+    <scope>provided</scope>
+</dependency> 
 
         <!-- MySQL Connector -->
 

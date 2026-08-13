@@ -5,15 +5,11 @@ public class Cart {
     private int cartId;
     private int userId;
     private int foodId;
-
     private String foodName;
     private double price;
-    private String imageUrl;
-
     private int quantity;
-
-    public Cart() {
-    }
+    private String imageUrl;
+    private double totalPrice;
 
     public int getCartId() {
         return cartId;
@@ -55,14 +51,6 @@ public class Cart {
         this.price = price;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
     public int getQuantity() {
         return quantity;
     }
@@ -71,8 +59,19 @@ public class Cart {
         this.quantity = quantity;
     }
 
-    // Total Price
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
     public double getTotalPrice() {
-        return price * quantity;
+        return totalPrice;
+    }
+
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
     }
 }
