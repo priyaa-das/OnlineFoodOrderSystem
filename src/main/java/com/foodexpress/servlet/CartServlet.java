@@ -18,30 +18,56 @@ import java.util.List;
 public class CartServlet extends HttpServlet {
 
     @Override
-    protected void doGet(HttpServletRequest request,
-                         HttpServletResponse response)
+    protected void doGet(
+            HttpServletRequest request,
+            HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession();
+        HttpSession session =
+                request.getSession();
 
-        User user = (User) session.getAttribute("user");
+        // Check customer login
+        User user =
+                (User) session.getAttribute("user");
 
         if (user == null) {
 
-            response.sendRedirect("login.jsp");
-            return;
+            response.sendRedirect(
+                    "login.jsp"
+            );
 
+            return;
         }
 
-        CartDAO dao = new CartDAO();
+        int userId =
+                user.getUserId();
 
-        List<Cart> cartList = dao.getCartItems(user.getUserId());
+        CartDAO dao =
+                new CartDAO();
 
-        request.setAttribute("cartList", cartList);
+        List<Cart> cartList =
+                dao.getCartByUserId(userId);
 
-        request.getRequestDispatcher("cart.jsp")
-               .forward(request, response);
+        request.setAttribute(
+                "cartList",
+                cartList
+        );
 
+        request.getRequestDispatcher(
+                "cart.jsp"
+        ).forward(
+                request,
+                response
+        );
     }
 
+
+    @Override
+    protected void doPost(
+            HttpServletRequest request,
+            HttpServletResponse response)
+            throws ServletException, IOException {
+
+        doGet(request, response);
+    }
 }

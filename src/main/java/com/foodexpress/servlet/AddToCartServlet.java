@@ -16,49 +16,114 @@ import java.io.IOException;
 public class AddToCartServlet extends HttpServlet {
 
     @Override
-    protected void doPost(HttpServletRequest request,
-                           HttpServletResponse response)
+    protected void doPost(
+            HttpServletRequest request,
+            HttpServletResponse response)
             throws ServletException, IOException {
 
-        System.out.println("===== AddToCartServlet CALLED =====");
+        System.out.println(
+                "===== AddToCartServlet CALLED ====="
+        );
 
-        HttpSession session = request.getSession();
+        HttpSession session =
+                request.getSession();
 
-        User user = (User) session.getAttribute("user");
+        User user =
+                (User) session.getAttribute("user");
+
+        // =====================================================
+        // CHECK LOGIN
+        // =====================================================
 
         if (user == null) {
 
-            System.out.println("USER IS NULL");
+            System.out.println(
+                    "USER IS NULL"
+            );
 
-            response.sendRedirect("login.jsp");
-            return;
-        }
-
-        System.out.println(
-                "Logged User ID = " + user.getUserId()
-        );
-
-        String foodIdText =
-                request.getParameter("foodId");
-
-        System.out.println(
-                "Food ID = " + foodIdText
-        );
-
-        if (foodIdText == null ||
-            foodIdText.trim().isEmpty()) {
-
-            response.getWriter().println(
-                    "Food ID is missing!"
+            response.sendRedirect(
+                    request.getContextPath()
+                    + "/login.jsp"
             );
 
             return;
         }
 
+        System.out.println(
+                "Logged User ID = "
+                + user.getUserId()
+        );
+
+
+        // =====================================================
+        // GET FOOD ID
+        // =====================================================
+
+        String foodIdText =
+                request.getParameter("foodId");
+
+        System.out.println(
+                "Food ID = "
+                + foodIdText
+        );
+
+        if (foodIdText == null ||
+                foodIdText.trim().isEmpty()) {
+
+            response.getWriter().println(
+                    "<h2>Food ID is missing!</h2>"
+            );
+
+            return;
+        }
+
+
+        // =====================================================
+        // GET QUANTITY
+        // =====================================================
+
+        String quantityText =
+                request.getParameter("quantity");
+
+        int quantity = 1;
+
+        if (quantityText != null &&
+                !quantityText.trim().isEmpty()) {
+
+            try {
+
+                quantity =
+                        Integer.parseInt(
+                                quantityText
+                        );
+
+            } catch (NumberFormatException e) {
+
+                quantity = 1;
+            }
+        }
+
+
+        // =====================================================
+        // VALIDATE QUANTITY
+        // =====================================================
+
+        if (quantity <= 0) {
+
+            quantity = 1;
+        }
+
+
+        // =====================================================
+        // ADD TO CART
+        // =====================================================
+
         try {
 
             int foodId =
-                    Integer.parseInt(foodIdText);
+                    Integer.parseInt(
+                            foodIdText
+                    );
 
             CartDAO dao =
                     new CartDAO();
@@ -66,12 +131,19 @@ public class AddToCartServlet extends HttpServlet {
             boolean result =
                     dao.addToCart(
                             user.getUserId(),
-                            foodId
+                            foodId,
+                            quantity
                     );
 
             System.out.println(
-                    "Add To Cart Result = " + result
+                    "Add To Cart Result = "
+                    + result
             );
+
+
+            // =================================================
+            // SUCCESS
+            // =================================================
 
             if (result) {
 
@@ -80,12 +152,27 @@ public class AddToCartServlet extends HttpServlet {
                         + "/CartServlet"
                 );
 
-            } else {
+            }
+
+            // =================================================
+            // FAILED
+            // =================================================
+
+            else {
 
                 response.getWriter().println(
                         "<h2>Failed to add food to cart!</h2>"
                 );
             }
+
+
+        } catch (NumberFormatException e) {
+
+            e.printStackTrace();
+
+            response.getWriter().println(
+                    "<h2>Invalid Food ID!</h2>"
+            );
 
         } catch (Exception e) {
 
