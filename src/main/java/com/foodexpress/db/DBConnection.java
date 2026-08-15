@@ -10,7 +10,7 @@ public class DBConnection {
 
     private static final String USER = "root";
 
-    private static final String PASSWORD = "j@ykaliMAsohayhou!!";
+    private static final String PASSWORD = "P6*7ffGty";
 
     public static Connection getConnection() {
 
