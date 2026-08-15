@@ -19,6 +19,10 @@ import java.util.List;
 @WebServlet("/PlaceOrderServlet")
 public class PlaceOrderServlet extends HttpServlet {
 
+    // =====================================================
+    // PLACE ORDER
+    // =====================================================
+
     @Override
     protected void doPost(
             HttpServletRequest request,
@@ -29,34 +33,29 @@ public class PlaceOrderServlet extends HttpServlet {
                 "========== PLACE ORDER SERVLET CALLED =========="
         );
 
-
         // =================================================
         // GET SESSION
         // =================================================
 
-        HttpSession session =
-                request.getSession();
+        HttpSession session = request.getSession();
 
+        User user = (User) session.getAttribute("user");
 
-        User user =
-                (User) session.getAttribute("user");
-
-
+        // User login check
         if (user == null) {
 
             response.sendRedirect(
-                    "login.jsp"
+                    request.getContextPath() + "/login.jsp"
             );
 
             return;
         }
 
+        int userId = user.getUserId();
 
         System.out.println(
-                "User ID = "
-                + user.getUserId()
+                "User ID = " + userId
         );
-
 
         // =================================================
         // GET FORM DATA
@@ -65,142 +64,173 @@ public class PlaceOrderServlet extends HttpServlet {
         String phone =
                 request.getParameter("phone");
 
-
         String address =
                 request.getParameter("address");
 
-
         String paymentMethod =
-                request.getParameter(
-                        "paymentMethod"
-                );
-
+                request.getParameter("paymentMethod");
 
         System.out.println(
                 "Phone = " + phone
         );
 
-
         System.out.println(
                 "Address = " + address
         );
 
-
         System.out.println(
-                "Payment Method = "
-                + paymentMethod
+                "Payment Method = " + paymentMethod
         );
 
-
         // =================================================
-        // VALIDATION
+        // VALIDATE ADDRESS
         // =================================================
 
         if (address == null ||
-            address.trim().isEmpty()) {
+                address.trim().isEmpty()) {
 
             response.setContentType(
                     "text/html;charset=UTF-8"
             );
 
-
             response.getWriter().println(
+                    "<html>" +
+                    "<head>" +
+                    "<title>Order Error</title>" +
+                    "</head>" +
+                    "<body>" +
+
                     "<h2>Delivery address is required!</h2>" +
-                    "<a href='CheckoutServlet'>Back to Checkout</a>"
-            );
 
+                    "<a href='" +
+                    request.getContextPath() +
+                    "/CheckoutServlet'>" +
+                    "Back to Checkout" +
+                    "</a>" +
+
+                    "</body>" +
+                    "</html>"
+            );
 
             return;
         }
-
-
-        if (paymentMethod == null ||
-            paymentMethod.trim().isEmpty()) {
-
-            response.setContentType(
-                    "text/html;charset=UTF-8"
-            );
-
-
-            response.getWriter().println(
-                    "<h2>Please select a payment method!</h2>" +
-                    "<a href='CheckoutServlet'>Back to Checkout</a>"
-            );
-
-
-            return;
-        }
-
 
         // =================================================
-        // GET CART
+        // VALIDATE PAYMENT METHOD
+        // =================================================
+
+        if (paymentMethod == null ||
+                paymentMethod.trim().isEmpty()) {
+
+            response.setContentType(
+                    "text/html;charset=UTF-8"
+            );
+
+            response.getWriter().println(
+                    "<html>" +
+                    "<head>" +
+                    "<title>Order Error</title>" +
+                    "</head>" +
+                    "<body>" +
+
+                    "<h2>Please select a payment method!</h2>" +
+
+                    "<a href='" +
+                    request.getContextPath() +
+                    "/CheckoutServlet'>" +
+                    "Back to Checkout" +
+                    "</a>" +
+
+                    "</body>" +
+                    "</html>"
+            );
+
+            return;
+        }
+
+        // =================================================
+        // GET CART ITEMS
         // =================================================
 
         CartDAO cartDAO =
                 new CartDAO();
 
-
         List<Cart> cartList =
-                cartDAO.getCartItems(
-                        user.getUserId()
-                );
-
+                cartDAO.getCartItems(userId);
 
         System.out.println(
-                "Cart size = "
-                + (cartList == null
-                ? "null"
-                : cartList.size())
+                "Cart Size = " +
+                (cartList == null
+                        ? "null"
+                        : cartList.size())
         );
 
+        // =================================================
+        // CHECK CART
+        // =================================================
 
         if (cartList == null ||
-            cartList.isEmpty()) {
+                cartList.isEmpty()) {
 
             response.setContentType(
                     "text/html;charset=UTF-8"
             );
 
-
             response.getWriter().println(
-                    "<h2>Your cart is empty!</h2>" +
-                    "<a href='MenuServlet'>Go to Menu</a>"
-            );
+                    "<html>" +
+                    "<head>" +
+                    "<title>Empty Cart</title>" +
+                    "</head>" +
+                    "<body>" +
 
+                    "<h2>Your cart is empty!</h2>" +
+
+                    "<a href='" +
+                    request.getContextPath() +
+                    "/MenuServlet'>" +
+                    "Go to Menu" +
+                    "</a>" +
+
+                    "</body>" +
+                    "</html>"
+            );
 
             return;
         }
 
-
         // =================================================
-        // CALCULATE TOTAL
+        // CALCULATE SUBTOTAL
         // =================================================
 
-        double subtotal = 0;
-
+        double subtotal = 0.0;
 
         for (Cart cart : cartList) {
 
-            double itemTotal =
-                    cart.getPrice()
-                    * cart.getQuantity();
+            double price =
+                    cart.getPrice();
 
+            int quantity =
+                    cart.getQuantity();
+
+            double itemTotal =
+                    price * quantity;
 
             subtotal += itemTotal;
 
-
             System.out.println(
-                    "Food = "
-                    + cart.getFoodName()
-                    + " | Price = "
-                    + cart.getPrice()
-                    + " | Qty = "
-                    + cart.getQuantity()
-                    + " | Total = "
-                    + itemTotal
+                    "Food = " +
+                    cart.getFoodName() +
+
+                    " | Price = " +
+                    price +
+
+                    " | Quantity = " +
+                    quantity +
+
+                    " | Item Total = " +
+                    itemTotal
             );
         }
-
 
         // =================================================
         // DELIVERY CHARGE
@@ -208,58 +238,50 @@ public class PlaceOrderServlet extends HttpServlet {
 
         double deliveryCharge;
 
-
         if (subtotal >= 2000) {
 
-            deliveryCharge = 0;
+            deliveryCharge = 0.0;
 
         } else {
 
-            deliveryCharge = 60;
+            deliveryCharge = 60.0;
         }
 
-
         // =================================================
-        // VAT
+        // VAT 5%
         // =================================================
 
         double vat =
                 subtotal * 0.05;
-
 
         // =================================================
         // GRAND TOTAL
         // =================================================
 
         double grandTotal =
+                subtotal +
+                deliveryCharge +
+                vat;
+
+        System.out.println(
+                "Subtotal = " +
                 subtotal
-                + deliveryCharge
-                + vat;
-
-
-        System.out.println(
-                "Subtotal = "
-                + subtotal
         );
 
-
         System.out.println(
-                "Delivery = "
-                + deliveryCharge
+                "Delivery Charge = " +
+                deliveryCharge
         );
 
-
         System.out.println(
-                "VAT = "
-                + vat
+                "VAT = " +
+                vat
         );
 
-
         System.out.println(
-                "Grand Total = "
-                + grandTotal
+                "Grand Total = " +
+                grandTotal
         );
-
 
         // =================================================
         // CREATE ORDER OBJECT
@@ -268,23 +290,22 @@ public class PlaceOrderServlet extends HttpServlet {
         Order order =
                 new Order();
 
-
-        order.setUserId(
-                user.getUserId()
-        );
-
+        order.setUserId(userId);
 
         order.setTotalAmount(
                 grandTotal
         );
 
-
+        // Initial order status
         order.setOrderStatus(
                 "Pending"
         );
 
+        // =================================================
+        // PAYMENT STATUS
+        // =================================================
 
-        if (paymentMethod.equals(
+        if (paymentMethod.equalsIgnoreCase(
                 "Cash on Delivery")) {
 
             order.setPaymentStatus(
@@ -298,22 +319,22 @@ public class PlaceOrderServlet extends HttpServlet {
             );
         }
 
+        // =================================================
+        // DELIVERY ADDRESS
+        // =================================================
 
         order.setDeliveryAddress(
-                address
+                address.trim()
         );
 
-
         // =================================================
-        // PLACE ORDER
+        // PLACE ORDER USING DAO
         // =================================================
 
         OrderDAO orderDAO =
                 new OrderDAO();
 
-
         int orderId;
-
 
         try {
 
@@ -328,78 +349,160 @@ public class PlaceOrderServlet extends HttpServlet {
 
             e.printStackTrace();
 
-
             response.setContentType(
                     "text/html;charset=UTF-8"
             );
 
-
             response.getWriter().println(
-                    "<h2>Order Error!</h2>" +
-                    "<pre>" +
-                    e.toString() +
-                    "</pre>" +
-                    "<a href='CartServlet'>Back to Cart</a>"
-            );
+                    "<html>" +
+                    "<head>" +
+                    "<title>Order Error</title>" +
+                    "</head>" +
+                    "<body>" +
 
+                    "<h2>Order Error!</h2>" +
+
+                    "<p>" +
+                    e.getMessage() +
+                    "</p>" +
+
+                    "<br>" +
+
+                    "<a href='" +
+                    request.getContextPath() +
+                    "/CartServlet'>" +
+                    "Back to Cart" +
+                    "</a>" +
+
+                    "</body>" +
+                    "</html>"
+            );
 
             return;
         }
 
-
         // =================================================
-        // SUCCESS
+        // ORDER SUCCESS
         // =================================================
 
         if (orderId > 0) {
 
             System.out.println(
-                    "Order successfully placed."
+                    "================================="
             );
 
+            System.out.println(
+                    "ORDER SUCCESSFULLY PLACED"
+            );
 
+            System.out.println(
+                    "Order ID = " +
+                    orderId
+            );
+
+            System.out.println(
+                    "User ID = " +
+                    userId
+            );
+
+            System.out.println(
+                    "Grand Total = " +
+                    grandTotal
+            );
+
+            System.out.println(
+                    "================================="
+            );
+
+            // Send order ID to success page
             response.sendRedirect(
-                    "orderSuccess.jsp?orderId="
+                    request.getContextPath()
+                    + "/orderSuccess.jsp?orderId="
                     + orderId
             );
 
-
         } else {
 
-            System.out.println(
-                    "OrderDAO returned -1."
-            );
+            // =================================================
+            // ORDER FAILED
+            // =================================================
 
+            System.out.println(
+                    "OrderDAO returned invalid Order ID: "
+                    + orderId
+            );
 
             response.setContentType(
                     "text/html;charset=UTF-8"
             );
 
-
             response.getWriter().println(
                     "<html>" +
+
                     "<head>" +
+
                     "<title>Order Failed</title>" +
+
+                    "<style>" +
+
+                    "body{" +
+                    "font-family:Arial;" +
+                    "background:#f5f7fb;" +
+                    "text-align:center;" +
+                    "padding-top:100px;" +
+                    "}" +
+
+                    ".box{" +
+                    "background:white;" +
+                    "width:450px;" +
+                    "margin:auto;" +
+                    "padding:40px;" +
+                    "border-radius:12px;" +
+                    "box-shadow:0 5px 20px rgba(0,0,0,0.1);" +
+                    "}" +
+
+                    "h2{" +
+                    "color:#dc2626;" +
+                    "}" +
+
+                    "a{" +
+                    "display:inline-block;" +
+                    "margin-top:20px;" +
+                    "padding:12px 25px;" +
+                    "background:#2196F3;" +
+                    "color:white;" +
+                    "text-decoration:none;" +
+                    "border-radius:6px;" +
+                    "}" +
+
+                    "</style>" +
+
                     "</head>" +
+
                     "<body>" +
+
+                    "<div class='box'>" +
 
                     "<h2>Order Failed!</h2>" +
 
                     "<p>" +
-                    "OrderDAO returned -1." +
+                    "Unable to place your order." +
                     "</p>" +
 
                     "<p>" +
-                    "Please check NetBeans Output." +
+                    "Please try again." +
                     "</p>" +
 
-                    "<br>" +
-
-                    "<a href='CartServlet'>" +
+                    "<a href='" +
+                    request.getContextPath() +
+                    "/CartServlet'>" +
                     "Back to Cart" +
                     "</a>" +
 
+                    "</div>" +
+
                     "</body>" +
+
                     "</html>"
             );
         }

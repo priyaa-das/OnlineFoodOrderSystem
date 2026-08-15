@@ -1,25 +1,33 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-
-<%@page import="java.util.List"%>
-<%@page import="com.foodexpress.model.Cart"%>
+<%@page import="java.util.*"%>
 <%@page import="com.foodexpress.model.User"%>
+<%@page import="com.foodexpress.model.Cart"%>
 
 <%
-    User user =
-            (User) session.getAttribute("user");
+    User user = (User) session.getAttribute("user");
 
     if (user == null) {
-
         response.sendRedirect("login.jsp");
         return;
     }
 
     List<Cart> cartList =
             (List<Cart>) request.getAttribute("cartList");
+
+    double subtotal = 0;
+
+    if (cartList != null) {
+        for (Cart cart : cartList) {
+            subtotal += cart.getPrice() * cart.getQuantity();
+        }
+    }
+
+    double deliveryCharge = (subtotal >= 2000) ? 0 : 60;
+    double vat = subtotal * 0.05;
+    double grandTotal = subtotal + deliveryCharge + vat;
 %>
 
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
@@ -31,31 +39,45 @@
 
     <title>My Cart | FoodExpress</title>
 
+    <link rel="stylesheet"
+          href="css/style.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
     <style>
+
+        * {
+            box-sizing: border-box;
+        }
 
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f7ff;
+            font-family: 'Poppins', sans-serif;
+            background: #f5f8fc;
+            color: #1e293b;
         }
+
+        /* ================= NAVBAR ================= */
 
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 18px 40px;
-            background: #0891b2;
+            padding: 18px 55px;
+            background: #2196F3;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.12);
         }
 
         .logo {
             color: white;
-            font-size: 25px;
-            font-weight: bold;
+            font-size: 27px;
+            font-weight: 700;
         }
 
         .nav-links {
-            list-style: none;
             display: flex;
+            list-style: none;
             gap: 25px;
             margin: 0;
             padding: 0;
@@ -64,84 +86,369 @@
         .nav-links a {
             color: white;
             text-decoration: none;
-            font-weight: bold;
+            font-size: 15px;
+            font-weight: 500;
         }
 
-        .container {
-            width: 90%;
-            margin: 40px auto;
+        .nav-links a:hover {
+            opacity: 0.8;
         }
 
-        h1 {
-            color: #1e293b;
-            margin-bottom: 30px;
+        .nav-links .active {
+            border-bottom: 2px solid white;
+            padding-bottom: 4px;
+        }
+
+        .logout-btn {
+            background: white;
+            color: #2196F3 !important;
+            padding: 8px 17px;
+            border-radius: 6px;
+        }
+
+        /* ================= HERO ================= */
+
+        .cart-hero {
+            min-height: 280px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 45px 70px;
+            background: linear-gradient(
+                135deg,
+                #e3f2fd,
+                #ffffff
+            );
+        }
+
+        .hero-text {
+            max-width: 600px;
+        }
+
+        .tagline {
+            color: #2196F3;
+            font-size: 15px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .hero-text h1 {
+            font-size: 42px;
+            margin: 10px 0;
+            color: #172554;
+        }
+
+        .hero-text p {
+            color: #64748b;
+            font-size: 16px;
+        }
+
+        .hero-image img {
+            width: 300px;
+            height: 210px;
+            object-fit: cover;
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        /* ================= MAIN ================= */
+
+        .cart-section {
+            padding: 50px 70px;
+        }
+
+        .cart-title {
+            font-size: 28px;
+            margin-bottom: 25px;
         }
 
         .cart-container {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow:
-                0 4px 15px
-                rgba(0,0,0,0.08);
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+            align-items: start;
         }
 
-        table {
+        /* ================= TABLE ================= */
+
+        .cart-table-box {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.07);
+            overflow-x: auto;
+        }
+
+        .cart-table {
             width: 100%;
             border-collapse: collapse;
         }
 
-        th {
-            background: #0891b2;
-            color: white;
-            padding: 14px;
+        .cart-table th {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 15px;
             text-align: left;
+            font-size: 14px;
         }
 
-        td {
-            padding: 15px;
-            border-bottom: 1px solid #ddd;
+        .cart-table td {
+            padding: 18px 15px;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: middle;
         }
 
         .food-image {
-            width: 80px;
-            height: 60px;
+            width: 75px;
+            height: 75px;
             object-fit: cover;
-            border-radius: 8px;
+            border-radius: 12px;
+        }
+
+        .food-name {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .price {
+            font-weight: 500;
         }
 
         .quantity {
-            font-weight: bold;
-            font-size: 17px;
+            background: #eff6ff;
+            padding: 7px 13px;
+            border-radius: 7px;
+            font-weight: 600;
         }
 
-        .remove-btn {
-            background: #ef4444;
-            color: white;
-            padding: 8px 14px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: bold;
-            display: inline-block;
+        .item-total {
+            color: #2196F3;
+            font-weight: 700;
         }
 
-        .remove-btn:hover {
-            background: #dc2626;
-        }
+        /* ================= EMPTY CART ================= */
 
-        .empty {
+        .empty-cart {
             text-align: center;
-            padding: 50px;
-            color: #64748b;
-            font-size: 18px;
+            padding: 60px 20px;
         }
 
-        .total-section {
-            margin-top: 25px;
-            text-align: right;
-            font-size: 22px;
-            font-weight: bold;
+        .empty-cart h2 {
+            margin-bottom: 8px;
+            color: #334155;
+        }
+
+        .empty-cart p {
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+
+        /* ================= SUMMARY ================= */
+
+        .summary {
+            background: white;
+            border-radius: 15px;
+            padding: 28px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 20px;
+        }
+
+        .summary h2 {
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 23px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            color: #64748b;
+        }
+
+        .summary-row span:last-child {
             color: #1e293b;
+            font-weight: 500;
+        }
+
+        .summary hr {
+            border: none;
+            border-top: 1px solid #e5e7eb;
+            margin: 20px 0;
+        }
+
+        .grand-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 20px;
+            font-weight: 700;
+            color: #172554;
+        }
+
+        .grand-total span:last-child {
+            color: #2196F3;
+        }
+
+        /* ================= BUTTONS ================= */
+
+        .button-group {
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .continue-btn,
+        .checkout-btn {
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            padding: 13px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .continue-btn {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .continue-btn:hover {
+            background: #bbdefb;
+        }
+
+        .checkout-btn {
+            background: #2196F3;
+            color: white;
+            box-shadow: 0 5px 15px rgba(33,150,243,0.25);
+        }
+
+        .checkout-btn:hover {
+            background: #1976d2;
+            transform: translateY(-1px);
+        }
+
+        /* ================= OFFER ================= */
+
+        .offer {
+            margin-top: 30px;
+            padding: 18px;
+            background: #e8f5e9;
+            border-left: 4px solid #43a047;
+            border-radius: 8px;
+        }
+
+        .offer strong {
+            color: #2e7d32;
+        }
+
+        .offer p {
+            margin: 5px 0 0;
+            color: #4b5563;
+            font-size: 13px;
+        }
+
+        /* ================= FOOTER ================= */
+
+        footer {
+            margin-top: 30px;
+            background: #172554;
+            color: white;
+            padding: 45px 70px 20px;
+        }
+
+        .footer-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 40px;
+        }
+
+        .footer-box h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .footer-box p {
+            color: #cbd5e1;
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        .footer-box a {
+            display: block;
+            color: #cbd5e1;
+            text-decoration: none;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .footer-box a:hover {
+            color: white;
+        }
+
+        .copyright {
+            text-align: center;
+            color: #94a3b8;
+            margin-top: 30px;
+            font-size: 13px;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 900px) {
+
+            .cart-container {
+                grid-template-columns: 1fr;
+            }
+
+            .summary {
+                position: static;
+            }
+
+            .cart-hero {
+                padding: 35px;
+            }
+
+            .cart-section {
+                padding: 35px;
+            }
+
+            .navbar {
+                padding: 18px 25px;
+            }
+
+        }
+
+        @media (max-width: 650px) {
+
+            .nav-links {
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+
+            .hero-image {
+                display: none;
+            }
+
+            .hero-text h1 {
+                font-size: 32px;
+            }
+
+            .cart-section {
+                padding: 25px 15px;
+            }
+
+            footer {
+                padding: 35px 25px 20px;
+            }
+
+            .footer-container {
+                grid-template-columns: 1fr;
+            }
+
         }
 
     </style>
@@ -161,19 +468,37 @@
     <ul class="nav-links">
 
         <li>
-            <a href="<%=request.getContextPath()%>/userHome.jsp">
-                Home
+            <a href="userHome.jsp">
+                Dashboard
             </a>
         </li>
 
         <li>
-            <a href="<%=request.getContextPath()%>/menu.jsp">
+            <a href="MenuServlet">
                 Menu
             </a>
         </li>
 
         <li>
-            <a href="<%=request.getContextPath()%>/LogoutServlet">
+            <a href="CartServlet" class="active">
+                My Cart
+            </a>
+        </li>
+
+        <li>
+            <a href="OrderHistoryServlet">
+                My Orders
+            </a>
+        </li>
+
+        <li>
+            <a href="profile.jsp">
+                Profile
+            </a>
+        </li>
+
+        <li>
+            <a href="LogoutServlet" class="logout-btn">
                 Logout
             </a>
         </li>
@@ -182,62 +507,69 @@
 
 </nav>
 
+
+<!-- ================= HERO ================= -->
+
+<section class="cart-hero">
+
+    <div class="hero-text">
+
+        <span class="tagline">
+            Shopping Cart
+        </span>
+
+        <h1>
+            Your Cart
+        </h1>
+
+        <p>
+            Review your selected meals and place your order.
+        </p>
+
+    </div>
+
+    <div class="hero-image">
+
+        <img
+            src="https://images.pexels.com/photos/5638732/pexels-photo-5638732.jpeg"
+            alt="Food Cart">
+
+    </div>
+
+</section>
+
+
 <!-- ================= CART ================= -->
 
-<div class="container">
+<section class="cart-section">
 
-    <h1>
-        My Cart
-    </h1>
+    <h2 class="cart-title">
+        Your Selected Items
+    </h2>
+
 
     <div class="cart-container">
 
-        <% if (cartList == null ||
-               cartList.isEmpty()) { %>
 
-            <div class="empty">
+        <!-- ================= CART ITEMS ================= -->
 
-                <h2>
-                    Your cart is empty
-                </h2>
+        <div class="cart-table-box">
 
-                <p>
-                    Add some delicious food from the menu.
-                </p>
+            <%
+                if (cartList != null && !cartList.isEmpty()) {
+            %>
 
-            </div>
-
-        <% } else { %>
-
-            <table>
+            <table class="cart-table">
 
                 <thead>
 
                     <tr>
 
-                        <th>
-                            Food
-                        </th>
-
-                        <th>
-                            Name
-                        </th>
-
-                        <th>
-                            Price
-                        </th>
-
-                        <th>
-                            Quantity
-                        </th>
-
-                        <th>
-                            Total
-                        </th>
-
-                        <th>
-                            Action
-                        </th>
+                        <th>Image</th>
+                        <th>Food</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
 
                     </tr>
 
@@ -246,66 +578,51 @@
                 <tbody>
 
                 <%
-                    double grandTotal = 0;
-
                     for (Cart cart : cartList) {
 
-                        double total =
-                                cart.getTotalPrice();
-
-                        grandTotal += total;
+                        double itemTotal =
+                                cart.getPrice()
+                                * cart.getQuantity();
                 %>
 
                     <tr>
 
                         <td>
 
-                            <%
-                                if (cart.getImageUrl() != null &&
-                                    !cart.getImageUrl().isEmpty()) {
-                            %>
-
-                                <img
-                                    src="<%=cart.getImageUrl()%>"
-                                    class="food-image"
-                                    alt="Food">
-
-                            <%
-                                }
-                            %>
+                            <img
+                                src="<%=cart.getImageUrl()%>"
+                                alt="<%=cart.getFoodName()%>"
+                                class="food-image">
 
                         </td>
 
-                        <td>
+                        <td class="food-name">
+
                             <%=cart.getFoodName()%>
+
                         </td>
 
-                        <td>
-                            ৳ <%=cart.getPrice()%>
+                        <td class="price">
+
+                            ৳<%=String.format("%.2f",
+                                    cart.getPrice())%>
+
                         </td>
 
                         <td>
 
                             <span class="quantity">
+
                                 <%=cart.getQuantity()%>
+
                             </span>
 
                         </td>
 
-                        <td>
-                            ৳ <%=total%>
-                        </td>
+                        <td class="item-total">
 
-                        <td>
-
-                            <a
-                                href="RemoveFromCartServlet?cartId=<%=cart.getCartId()%>"
-                                class="remove-btn"
-                                onclick="return confirm('Are you sure you want to remove this item from your cart?');">
-
-                                Remove
-
-                            </a>
+                            ৳<%=String.format("%.2f",
+                                    itemTotal)%>
 
                         </td>
 
@@ -319,20 +636,248 @@
 
             </table>
 
-            <!-- GRAND TOTAL -->
+            <%
+                } else {
+            %>
 
-            <div class="total-section">
+            <div class="empty-cart">
 
-                Grand Total:
-                ৳ <%=grandTotal%>
+                <h2>
+                    Your Cart is Empty
+                </h2>
+
+                <p>
+                    You haven't added any food yet.
+                </p>
+
+                <a href="MenuServlet"
+                   class="checkout-btn">
+
+                    Browse Menu
+
+                </a>
 
             </div>
 
-        <% } %>
+            <%
+                }
+            %>
+
+        </div>
+
+
+        <!-- ================= ORDER SUMMARY ================= -->
+
+        <div class="summary">
+
+            <h2>
+                Order Summary
+            </h2>
+
+
+            <div class="summary-row">
+
+                <span>
+                    Subtotal
+                </span>
+
+                <span>
+                    ৳<%=String.format("%.2f",
+                            subtotal)%>
+                </span>
+
+            </div>
+
+
+            <div class="summary-row">
+
+                <span>
+                    Delivery Charge
+                </span>
+
+                <span>
+
+                    <%
+                        if (deliveryCharge == 0) {
+                    %>
+
+                        FREE
+
+                    <%
+                        } else {
+                    %>
+
+                        ৳<%=String.format("%.2f",
+                                deliveryCharge)%>
+
+                    <%
+                        }
+                    %>
+
+                </span>
+
+            </div>
+
+
+            <div class="summary-row">
+
+                <span>
+                    VAT (5%)
+                </span>
+
+                <span>
+                    ৳<%=String.format("%.2f",
+                            vat)%>
+                </span>
+
+            </div>
+
+
+            <hr>
+
+
+            <div class="grand-total">
+
+                <span>
+                    Grand Total
+                </span>
+
+                <span>
+                    ৳<%=String.format("%.2f",
+                            grandTotal)%>
+                </span>
+
+            </div>
+
+
+            <%
+                if (cartList != null && !cartList.isEmpty()) {
+            %>
+
+            <div class="button-group">
+
+                <a href="MenuServlet"
+                   class="continue-btn">
+
+                    Continue Shopping
+
+                </a>
+
+                <!-- IMPORTANT -->
+                <!-- Place Order button -->
+
+                <a href="CheckoutServlet"
+                   class="checkout-btn">
+
+                    Proceed to Place Order
+
+                </a>
+
+            </div>
+
+            <%
+                }
+            %>
+
+
+            <div class="offer">
+
+                <strong>
+                    Free Delivery
+                </strong>
+
+                <p>
+                    Spend ৳2000 or more and enjoy
+                    free delivery.
+                </p>
+
+            </div>
+
+        </div>
 
     </div>
 
-</div>
+</section>
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+    <div class="footer-container">
+
+        <div class="footer-box">
+
+            <h3>
+                FoodExpress
+            </h3>
+
+            <p>
+                Delicious food, fast delivery and a
+                premium online food ordering experience.
+            </p>
+
+        </div>
+
+
+        <div class="footer-box">
+
+            <h3>
+                Quick Links
+            </h3>
+
+            <a href="userHome.jsp">
+                Dashboard
+            </a>
+
+            <a href="MenuServlet">
+                Menu
+            </a>
+
+            <a href="CartServlet">
+                My Cart
+            </a>
+
+            <a href="OrderHistoryServlet">
+                My Orders
+            </a>
+
+        </div>
+
+
+        <div class="footer-box">
+
+            <h3>
+                Contact Us
+            </h3>
+
+            <p>
+                Email: info@foodexpress.com
+            </p>
+
+            <p>
+                Phone: +880 1700-123456
+            </p>
+
+            <p>
+                Sylhet, Bangladesh
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <hr>
+
+
+    <p class="copyright">
+
+        © 2026 FoodExpress. All Rights Reserved.
+
+    </p>
+
+</footer>
 
 </body>
 
