@@ -40,7 +40,7 @@
         <li><a href="contact.jsp">Contact</a></li>
 
         <li><a href="login.jsp" class="login-btn">Login</a></li>
-
+        <li><a href="adminLogin.jsp" class="adminLogin-btn">Admin Login</a></li>    
         <li><a href="register.jsp" class="register-btn">Register</a></li>
 
     </ul>

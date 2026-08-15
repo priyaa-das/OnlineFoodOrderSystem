@@ -23,17 +23,37 @@ public class CheckoutServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
+        // =====================================================
+        // GET SESSION
+        // =====================================================
+
         HttpSession session =
                 request.getSession();
+
+        // =====================================================
+        // GET LOGGED USER
+        // =====================================================
 
         User user =
                 (User) session.getAttribute("user");
 
+        // =====================================================
+        // CHECK LOGIN
+        // =====================================================
+
         if (user == null) {
 
-            response.sendRedirect("login.jsp");
+            response.sendRedirect(
+                    request.getContextPath()
+                    + "/login.jsp"
+            );
+
             return;
         }
+
+        // =====================================================
+        // GET CART
+        // =====================================================
 
         CartDAO cartDAO =
                 new CartDAO();
@@ -43,15 +63,24 @@ public class CheckoutServlet extends HttpServlet {
                         user.getUserId()
                 );
 
+        // =====================================================
+        // CHECK EMPTY CART
+        // =====================================================
+
         if (cartList == null ||
-            cartList.isEmpty()) {
+                cartList.isEmpty()) {
 
             response.sendRedirect(
-                    "CartServlet"
+                    request.getContextPath()
+                    + "/CartServlet"
             );
 
             return;
         }
+
+        // =====================================================
+        // CALCULATE SUBTOTAL
+        // =====================================================
 
         double subtotal = 0;
 
@@ -60,6 +89,10 @@ public class CheckoutServlet extends HttpServlet {
             subtotal +=
                     cart.getTotalPrice();
         }
+
+        // =====================================================
+        // DELIVERY CHARGE
+        // =====================================================
 
         double deliveryCharge;
 
@@ -72,13 +105,25 @@ public class CheckoutServlet extends HttpServlet {
             deliveryCharge = 60;
         }
 
+        // =====================================================
+        // VAT 5%
+        // =====================================================
+
         double vat =
                 subtotal * 0.05;
 
+        // =====================================================
+        // GRAND TOTAL
+        // =====================================================
+
         double grandTotal =
-                subtotal +
-                deliveryCharge +
-                vat;
+                subtotal
+                + deliveryCharge
+                + vat;
+
+        // =====================================================
+        // SEND DATA TO JSP
+        // =====================================================
 
         request.setAttribute(
                 "cartList",
@@ -104,6 +149,10 @@ public class CheckoutServlet extends HttpServlet {
                 "grandTotal",
                 grandTotal
         );
+
+        // =====================================================
+        // OPEN CHECKOUT PAGE
+        // =====================================================
 
         request.getRequestDispatcher(
                 "checkout.jsp"

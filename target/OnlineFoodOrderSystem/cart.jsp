@@ -1,22 +1,25 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="java.util.*"%>
-<%@page import="com.foodexpress.model.User"%>
+
+<%@page import="java.util.List"%>
 <%@page import="com.foodexpress.model.Cart"%>
+<%@page import="com.foodexpress.model.User"%>
 
 <%
-    User user = (User) session.getAttribute("user");
+    User user =
+            (User) session.getAttribute("user");
 
     if (user == null) {
+
         response.sendRedirect("login.jsp");
         return;
     }
 
-    List<Cart> cartList = (List<Cart>) request.getAttribute("cartList");
-
-    double subtotal = 0;
+    List<Cart> cartList =
+            (List<Cart>) request.getAttribute("cartList");
 %>
 
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -28,11 +31,120 @@
 
     <title>My Cart | FoodExpress</title>
 
-    <link rel="stylesheet"
-          href="css/style.css">
+    <style>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet">
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7ff;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 40px;
+            background: #0891b2;
+        }
+
+        .logo {
+            color: white;
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 25px;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .container {
+            width: 90%;
+            margin: 40px auto;
+        }
+
+        h1 {
+            color: #1e293b;
+            margin-bottom: 30px;
+        }
+
+        .cart-container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow:
+                0 4px 15px
+                rgba(0,0,0,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #0891b2;
+            color: white;
+            padding: 14px;
+            text-align: left;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .food-image {
+            width: 80px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .quantity {
+            font-weight: bold;
+            font-size: 17px;
+        }
+
+        .remove-btn {
+            background: #ef4444;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .remove-btn:hover {
+            background: #dc2626;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 50px;
+            color: #64748b;
+            font-size: 18px;
+        }
+
+        .total-section {
+            margin-top: 25px;
+            text-align: right;
+            font-size: 22px;
+            font-weight: bold;
+            color: #1e293b;
+        }
+
+    </style>
 
 </head>
 
@@ -43,345 +155,184 @@
 <nav class="navbar">
 
     <div class="logo">
-
         FoodExpress
-
     </div>
 
     <ul class="nav-links">
 
-        <li><a href="userHome.jsp">Dashboard</a></li>
+        <li>
+            <a href="<%=request.getContextPath()%>/userHome.jsp">
+                Home
+            </a>
+        </li>
 
-        <li><a href="MenuServlet">Menu</a></li>
+        <li>
+            <a href="<%=request.getContextPath()%>/menu.jsp">
+                Menu
+            </a>
+        </li>
 
-        <li><a href="CartServlet" class="active">My Cart</a></li>
-
-        <li><a href="orderHistory.jsp">My Orders</a></li>
-
-        <li><a href="profile.jsp">Profile</a></li>
-
-        <li><a href="LogoutServlet" class="login-btn">Logout</a></li>
+        <li>
+            <a href="<%=request.getContextPath()%>/LogoutServlet">
+                Logout
+            </a>
+        </li>
 
     </ul>
 
 </nav>
 
-<!-- ================= HERO ================= -->
+<!-- ================= CART ================= -->
 
-<section class="dashboard-hero">
+<div class="container">
 
-    <div class="dashboard-left">
+    <h1>
+        My Cart
+    </h1>
 
-        <span class="tagline">
+    <div class="cart-container">
 
-            Shopping Cart
+        <% if (cartList == null ||
+               cartList.isEmpty()) { %>
 
-        </span>
+            <div class="empty">
 
-        <h1>
+                <h2>
+                    Your cart is empty
+                </h2>
 
-            My Cart
+                <p>
+                    Add some delicious food from the menu.
+                </p>
 
-        </h1>
+            </div>
 
-        <p>
+        <% } else { %>
 
-            Review your selected meals before checkout.
+            <table>
 
-        </p>
+                <thead>
 
-    </div>
+                    <tr>
 
-    <div class="dashboard-right">
+                        <th>
+                            Food
+                        </th>
 
-        <img src="https://images.pexels.com/photos/5638732/pexels-photo-5638732.jpeg"
-             alt="Cart">
+                        <th>
+                            Name
+                        </th>
 
-    </div>
+                        <th>
+                            Price
+                        </th>
 
-</section>
+                        <th>
+                            Quantity
+                        </th>
 
-<!-- ================= CART TABLE ================= -->
+                        <th>
+                            Total
+                        </th>
 
-<section class="dashboard">
+                        <th>
+                            Action
+                        </th>
 
-    <h2>Cart Items</h2>
+                    </tr>
 
-    <table class="order-table">
+                </thead>
 
-        <tr>
+                <tbody>
 
-            <th>Image</th>
-            <th>Food</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Total</th>
+                <%
+                    double grandTotal = 0;
 
-        </tr>
-        <%
-if(cartList != null && !cartList.isEmpty()){
+                    for (Cart cart : cartList) {
 
-    for(Cart cart : cartList){
+                        double total =
+                                cart.getTotalPrice();
 
-        subtotal += cart.getTotalPrice();
-%>
+                        grandTotal += total;
+                %>
 
-<tr>
+                    <tr>
 
-    <td>
+                        <td>
 
-        <img src="<%=cart.getImageUrl()%>"
-             alt="<%=cart.getFoodName()%>"
-             width="80"
-             height="80"
-             style="border-radius:10px;">
+                            <%
+                                if (cart.getImageUrl() != null &&
+                                    !cart.getImageUrl().isEmpty()) {
+                            %>
 
-    </td>
+                                <img
+                                    src="<%=cart.getImageUrl()%>"
+                                    class="food-image"
+                                    alt="Food">
 
-    <td>
+                            <%
+                                }
+                            %>
 
-        <%=cart.getFoodName()%>
+                        </td>
 
-    </td>
+                        <td>
+                            <%=cart.getFoodName()%>
+                        </td>
 
-    <td>
+                        <td>
+                            ৳ <%=cart.getPrice()%>
+                        </td>
 
-        ৳<%=cart.getPrice()%>
+                        <td>
 
-    </td>
+                            <span class="quantity">
+                                <%=cart.getQuantity()%>
+                            </span>
 
-    <td>
+                        </td>
 
-        <%=cart.getQuantity()%>
+                        <td>
+                            ৳ <%=total%>
+                        </td>
 
-    </td>
+                        <td>
 
-    <td>
+                            <a
+                                href="RemoveFromCartServlet?cartId=<%=cart.getCartId()%>"
+                                class="remove-btn"
+                                onclick="return confirm('Are you sure you want to remove this item from your cart?');">
 
-        ৳<%=cart.getTotalPrice()%>
+                                Remove
 
-    </td>
+                            </a>
 
-</tr>
+                        </td>
 
-<%
+                    </tr>
 
-    }
+                <%
+                    }
+                %>
 
-}else{
+                </tbody>
 
-%>
+            </table>
 
-<tr>
+            <!-- GRAND TOTAL -->
 
-    <td colspan="5"
-        style="text-align:center;padding:25px;">
+            <div class="total-section">
 
-        <h3>Your Cart is Empty</h3>
+                Grand Total:
+                ৳ <%=grandTotal%>
 
-        <p>Add some delicious food from the menu.</p>
+            </div>
 
-    </td>
-
-</tr>
-
-<%
-
-}
-
-%>
-
-    </table>
-<%
-    double deliveryCharge = 60;
-    double vat = subtotal * 0.05;
-    double grandTotal = subtotal + deliveryCharge + vat;
-%>
-
-<!-- ================= ORDER SUMMARY ================= -->
-
-<div class="cart-summary">
-
-    <h2>
-
-        Order Summary
-
-    </h2>
-
-    <div class="summary-row">
-
-        <span>Subtotal</span>
-
-        <span>৳<%=String.format("%.2f", subtotal)%></span>
-
-    </div>
-
-    <div class="summary-row">
-
-        <span>Delivery Charge</span>
-
-        <span>৳<%=String.format("%.2f", deliveryCharge)%></span>
-
-    </div>
-
-    <div class="summary-row">
-
-        <span>VAT (5%)</span>
-
-        <span>৳<%=String.format("%.2f", vat)%></span>
-
-    </div>
-
-    <hr>
-
-    <div class="summary-row total">
-
-        <span><strong>Grand Total</strong></span>
-
-        <span><strong>৳<%=String.format("%.2f", grandTotal)%></strong></span>
-
-    </div>
-
-    <div class="cart-buttons">
-
-        <a href="MenuServlet"
-           class="secondary-btn">
-
-            Continue Shopping
-
-        </a>
-
-        <a href="<%=request.getContextPath()%>/CheckoutServlet"
-           class="primary-btn">
-
-            Proceed to Checkout
-
-        </a>
+        <% } %>
 
     </div>
 
 </div>
-
-</section>
-
-<!-- ================= SPECIAL OFFER ================= -->
-
-<section class="offers">
-
-    <div class="offer-box">
-
-        <h2>
-
-            🚚 Free Delivery Offer
-
-        </h2>
-
-        <p>
-
-            Spend more than <strong>৳2000</strong>
-            and enjoy <strong>FREE Delivery</strong>.
-
-        </p>
-
-    </div>
-
-</section>
-<!-- ================= FOOTER ================= -->
-
-<footer>
-
-    <div class="footer-container">
-
-        <div class="footer-box">
-
-            <h3>
-
-                FoodExpress
-
-            </h3>
-
-            <p>
-
-                Delicious food, fast delivery and a premium online
-                food ordering experience.
-
-            </p>
-
-        </div>
-
-        <div class="footer-box">
-
-            <h3>
-
-                Quick Links
-
-            </h3>
-
-            <a href="userHome.jsp">
-
-                Dashboard
-
-            </a>
-
-            <a href="MenuServlet">
-
-                Menu
-
-            </a>
-
-            <a href="CartServlet">
-
-                My Cart
-
-            </a>
-
-            <a href="orderHistory.jsp">
-
-                My Orders
-
-            </a>
-
-        </div>
-
-        <div class="footer-box">
-
-            <h3>
-
-                Contact Us
-
-            </h3>
-
-            <p>
-
-                Email : info@foodexpress.com
-
-            </p>
-
-            <p>
-
-                Phone : +880 1700-123456
-
-            </p>
-
-            <p>
-
-                Sylhet, Bangladesh
-
-            </p>
-
-        </div>
-
-    </div>
-
-    <hr>
-
-    <p class="copyright">
-
-        © 2026 FoodExpress. All Rights Reserved.
-
-    </p>
-
-</footer>
 
 </body>
 
