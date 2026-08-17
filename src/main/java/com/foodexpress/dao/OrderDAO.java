@@ -7,38 +7,278 @@ import com.foodexpress.model.Order;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 public class OrderDAO {
 
-    // =========================================================
-    // 1. GET ORDERS OF A USER
-    // =========================================================
+    // =====================================================
+    // PLACE ORDER
+    // =====================================================
+
+    public int placeOrder(
+            Order order,
+            List<Cart> cartList,
+            String paymentMethod) {
+
+        Connection con = null;
+        PreparedStatement orderPst = null;
+        PreparedStatement itemPst = null;
+        PreparedStatement clearPst = null;
+        ResultSet rs = null;
+
+        int orderId = -1;
+
+        try {
+
+            con = DBConnection.getConnection();
+
+            con.setAutoCommit(false);
+
+            // =============================================
+            // INSERT ORDER
+            // =============================================
+
+            String orderSql =
+                    "INSERT INTO orders " +
+                    "(user_id, total_amount, order_status, " +
+                    "payment_status, delivery_address) " +
+                    "VALUES (?, ?, ?, ?, ?)";
+
+            orderPst = con.prepareStatement(
+                    orderSql,
+                    Statement.RETURN_GENERATED_KEYS
+            );
+
+            orderPst.setInt(
+                    1,
+                    order.getUserId()
+            );
+
+            orderPst.setDouble(
+                    2,
+                    order.getTotalAmount()
+            );
+
+            orderPst.setString(
+                    3,
+                    order.getOrderStatus()
+            );
+
+            orderPst.setString(
+                    4,
+                    order.getPaymentStatus()
+            );
+
+            orderPst.setString(
+                    5,
+                    order.getDeliveryAddress()
+            );
+
+            int rows =
+                    orderPst.executeUpdate();
+
+            if (rows == 0) {
+
+                con.rollback();
+
+                return -1;
+            }
+
+            // =============================================
+            // GET GENERATED ORDER ID
+            // =============================================
+
+            rs =
+                    orderPst.getGeneratedKeys();
+
+            if (rs.next()) {
+
+                orderId =
+                        rs.getInt(1);
+
+            } else {
+
+                con.rollback();
+
+                return -1;
+            }
+
+            // =============================================
+            // INSERT ORDER ITEMS
+            // =============================================
+
+            /*
+             * This code assumes an order_items table.
+             *
+             * If you do not have order_items table yet,
+             * comment this section temporarily.
+             */
+
+            String itemSql =
+                    "INSERT INTO order_items " +
+                    "(order_id, food_id, quantity, price) " +
+                    "VALUES (?, ?, ?, ?)";
+
+            try {
+
+                itemPst =
+                        con.prepareStatement(itemSql);
+
+                for (Cart cart : cartList) {
+
+                    itemPst.setInt(
+                            1,
+                            orderId
+                    );
+
+                    itemPst.setInt(
+                            2,
+                            cart.getFoodId()
+                    );
+
+                    itemPst.setInt(
+                            3,
+                            cart.getQuantity()
+                    );
+
+                    itemPst.setDouble(
+                            4,
+                            cart.getPrice()
+                    );
+
+                    itemPst.addBatch();
+                }
+
+                itemPst.executeBatch();
+
+            } catch (Exception e) {
+
+                /*
+                 * If order_items table does not exist,
+                 * order itself can still be saved.
+                 */
+
+                System.out.println(
+                        "Order items table not available."
+                );
+
+            }
+
+            // =============================================
+            // CLEAR CART
+            // =============================================
+
+            String clearSql =
+                    "DELETE FROM cart WHERE user_id=?";
+
+            clearPst =
+                    con.prepareStatement(clearSql);
+
+            clearPst.setInt(
+                    1,
+                    order.getUserId()
+            );
+
+            clearPst.executeUpdate();
+
+            // =============================================
+            // COMMIT
+            // =============================================
+
+            con.commit();
+
+            return orderId;
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            try {
+
+                if (con != null) {
+                    con.rollback();
+                }
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
+            return -1;
+
+        } finally {
+
+            try {
+                if (rs != null) rs.close();
+            } catch (Exception e) {
+            }
+
+            try {
+                if (orderPst != null) orderPst.close();
+            } catch (Exception e) {
+            }
+
+            try {
+                if (itemPst != null) itemPst.close();
+            } catch (Exception e) {
+            }
+
+            try {
+                if (clearPst != null) clearPst.close();
+            } catch (Exception e) {
+            }
+
+            try {
+                if (con != null) {
+                    con.setAutoCommit(true);
+                    con.close();
+                }
+            } catch (Exception e) {
+            }
+        }
+    }
+
+
+    // =====================================================
+    // GET ORDERS OF USER
+    // =====================================================
 
     public List<Order> getOrdersByUser(int userId) {
 
-        List<Order> orderList = new ArrayList<>();
+        List<Order> orderList =
+                new ArrayList<>();
 
         String sql =
                 "SELECT order_id, user_id, total_amount, " +
-                "order_status, payment_status, delivery_address, order_date " +
+                "order_status, payment_status, " +
+                "delivery_address, order_date " +
                 "FROM orders " +
                 "WHERE user_id=? " +
                 "ORDER BY order_date DESC";
 
         try (
-                Connection con = DBConnection.getConnection();
-                PreparedStatement pst = con.prepareStatement(sql)
+                Connection con =
+                        DBConnection.getConnection();
+
+                PreparedStatement pst =
+                        con.prepareStatement(sql)
         ) {
 
-            pst.setInt(1, userId);
+            pst.setInt(
+                    1,
+                    userId
+            );
 
-            try (ResultSet rs = pst.executeQuery()) {
+            try (
+                    ResultSet rs =
+                            pst.executeQuery()
+            ) {
 
                 while (rs.next()) {
 
-                    Order order = new Order();
+                    Order order =
+                            new Order();
 
                     order.setOrderId(
                             rs.getInt("order_id")
@@ -64,12 +304,16 @@ public class OrderDAO {
                             rs.getString("delivery_address")
                     );
 
-                    if (rs.getTimestamp("order_date") != null) {
+                    /*
+                     * Order.java uses String.
+                     * Therefore Timestamp is converted
+                     * to String.
+                     */
 
-                        order.setOrderDate(
-                                rs.getTimestamp("order_date").toString()
-                        );
-                    }
+                    order.setOrderDate(
+                            rs.getTimestamp("order_date")
+                               .toString()
+                    );
 
                     orderList.add(order);
                 }
@@ -84,13 +328,14 @@ public class OrderDAO {
     }
 
 
-    // =========================================================
-    // 2. GET ALL ORDERS FOR ADMIN
-    // =========================================================
+    // =====================================================
+    // GET ALL ORDERS - ADMIN
+    // =====================================================
 
     public List<Order> getAllOrders() {
 
-        List<Order> orderList = new ArrayList<>();
+        List<Order> orderList =
+                new ArrayList<>();
 
         String sql =
                 "SELECT o.order_id, o.user_id, " +
@@ -99,19 +344,25 @@ public class OrderDAO {
                 "o.order_date, " +
                 "u.full_name, u.email, u.phone " +
                 "FROM orders o " +
-                "LEFT JOIN users u " +
+                "INNER JOIN users u " +
                 "ON o.user_id = u.user_id " +
                 "ORDER BY o.order_date DESC";
 
         try (
-                Connection con = DBConnection.getConnection();
-                PreparedStatement pst = con.prepareStatement(sql);
-                ResultSet rs = pst.executeQuery()
+                Connection con =
+                        DBConnection.getConnection();
+
+                PreparedStatement pst =
+                        con.prepareStatement(sql);
+
+                ResultSet rs =
+                        pst.executeQuery()
         ) {
 
             while (rs.next()) {
 
-                Order order = new Order();
+                Order order =
+                        new Order();
 
                 order.setOrderId(
                         rs.getInt("order_id")
@@ -119,6 +370,18 @@ public class OrderDAO {
 
                 order.setUserId(
                         rs.getInt("user_id")
+                );
+
+                order.setCustomerName(
+                        rs.getString("full_name")
+                );
+
+                order.setEmail(
+                        rs.getString("email")
+                );
+
+                order.setPhone(
+                        rs.getString("phone")
                 );
 
                 order.setTotalAmount(
@@ -137,24 +400,10 @@ public class OrderDAO {
                         rs.getString("delivery_address")
                 );
 
-                order.setCustomerName(
-                        rs.getString("full_name")
+                order.setOrderDate(
+                        rs.getTimestamp("order_date")
+                           .toString()
                 );
-
-                order.setEmail(
-                        rs.getString("email")
-                );
-
-                order.setPhone(
-                        rs.getString("phone")
-                );
-
-                if (rs.getTimestamp("order_date") != null) {
-
-                    order.setOrderDate(
-                            rs.getTimestamp("order_date").toString()
-                    );
-                }
 
                 orderList.add(order);
             }
@@ -168,274 +417,13 @@ public class OrderDAO {
     }
 
 
-    // =========================================================
-    // 3. PLACE ORDER
-    // =========================================================
-
-    public int placeOrder(
-            Order order,
-            List<Cart> cartList,
-            String paymentMethod) {
-
-        Connection con = null;
-
-        PreparedStatement orderPst = null;
-        PreparedStatement itemPst = null;
-
-        ResultSet generatedKeys = null;
-
-        int orderId = -1;
-
-        try {
-
-            con = DBConnection.getConnection();
-
-            // Start transaction
-            con.setAutoCommit(false);
-
-
-            // =================================================
-            // INSERT ORDER
-            // =================================================
-
-            String orderSQL =
-                    "INSERT INTO orders " +
-                    "(user_id, total_amount, order_status, " +
-                    "payment_status, delivery_address) " +
-                    "VALUES (?, ?, ?, ?, ?)";
-
-            orderPst = con.prepareStatement(
-                    orderSQL,
-                    PreparedStatement.RETURN_GENERATED_KEYS
-            );
-
-            orderPst.setInt(
-                    1,
-                    order.getUserId()
-            );
-
-            orderPst.setDouble(
-                    2,
-                    order.getTotalAmount()
-            );
-
-
-            // =================================================
-            // ORDER STATUS
-            // =================================================
-
-            String orderStatus =
-                    order.getOrderStatus();
-
-            if (orderStatus == null ||
-                    orderStatus.trim().isEmpty()) {
-
-                orderStatus = "Pending";
-            }
-
-            orderPst.setString(
-                    3,
-                    orderStatus
-            );
-
-
-            // =================================================
-            // PAYMENT STATUS
-            // =================================================
-
-            String paymentStatus =
-                    order.getPaymentStatus();
-
-            if (paymentStatus == null ||
-                    paymentStatus.trim().isEmpty()) {
-
-                paymentStatus = "Pending";
-            }
-
-            if (paymentStatus.equalsIgnoreCase("Paid")) {
-
-                paymentStatus = "Paid";
-
-            } else {
-
-                paymentStatus = "Pending";
-            }
-
-            orderPst.setString(
-                    4,
-                    paymentStatus
-            );
-
-
-            // =================================================
-            // DELIVERY ADDRESS
-            // =================================================
-
-            orderPst.setString(
-                    5,
-                    order.getDeliveryAddress()
-            );
-
-
-            // =================================================
-            // EXECUTE ORDER INSERT
-            // =================================================
-
-            int affectedRows =
-                    orderPst.executeUpdate();
-
-            if (affectedRows == 0) {
-
-                con.rollback();
-
-                return -1;
-            }
-
-
-            // =================================================
-            // GET GENERATED ORDER ID
-            // =================================================
-
-            generatedKeys =
-                    orderPst.getGeneratedKeys();
-
-            if (generatedKeys.next()) {
-
-                orderId =
-                        generatedKeys.getInt(1);
-            }
-
-            if (orderId <= 0) {
-
-                con.rollback();
-
-                return -1;
-            }
-
-
-            System.out.println(
-                    "Generated Order ID = "
-                    + orderId
-            );
-
-
-            // =================================================
-            // INSERT ORDER ITEMS
-            // =================================================
-
-            String itemSQL =
-                    "INSERT INTO order_items " +
-                    "(order_id, food_id, quantity, price) " +
-                    "VALUES (?, ?, ?, ?)";
-
-            itemPst =
-                    con.prepareStatement(itemSQL);
-
-
-            for (Cart cart : cartList) {
-
-                itemPst.setInt(
-                        1,
-                        orderId
-                );
-
-                itemPst.setInt(
-                        2,
-                        cart.getFoodId()
-                );
-
-                itemPst.setInt(
-                        3,
-                        cart.getQuantity()
-                );
-
-                itemPst.setDouble(
-                        4,
-                        cart.getPrice()
-                );
-
-                itemPst.addBatch();
-            }
-
-            itemPst.executeBatch();
-
-
-            // =================================================
-            // COMMIT
-            // =================================================
-
-            con.commit();
-
-            System.out.println(
-                    "Order successfully inserted."
-            );
-
-            System.out.println(
-                    "Order ID = " + orderId
-            );
-
-            return orderId;
-
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
-            try {
-
-                if (con != null) {
-
-                    con.rollback();
-                }
-
-            } catch (Exception rollbackException) {
-
-                rollbackException.printStackTrace();
-            }
-
-            return -1;
-
-
-        } finally {
-
-            try {
-
-                if (generatedKeys != null) {
-                    generatedKeys.close();
-                }
-
-                if (orderPst != null) {
-                    orderPst.close();
-                }
-
-                if (itemPst != null) {
-                    itemPst.close();
-                }
-
-                if (con != null) {
-
-                    con.setAutoCommit(true);
-
-                    con.close();
-                }
-
-            } catch (Exception closeException) {
-
-                closeException.printStackTrace();
-            }
-        }
-    }
-
-
-    // =========================================================
-    // 4. UPDATE ORDER STATUS
-    // =========================================================
+    // =====================================================
+    // UPDATE ORDER STATUS
+    // =====================================================
 
     public boolean updateOrderStatus(
             int orderId,
             String status) {
-
-        boolean updated = false;
 
         String sql =
                 "UPDATE orders " +
@@ -443,7 +431,9 @@ public class OrderDAO {
                 "WHERE order_id=?";
 
         try (
-                Connection con = DBConnection.getConnection();
+                Connection con =
+                        DBConnection.getConnection();
+
                 PreparedStatement pst =
                         con.prepareStatement(sql)
         ) {
@@ -458,136 +448,48 @@ public class OrderDAO {
                     orderId
             );
 
-            int rows =
-                    pst.executeUpdate();
-
-            if (rows > 0) {
-
-                updated = true;
-            }
+            return pst.executeUpdate() > 0;
 
         } catch (Exception e) {
 
             e.printStackTrace();
-        }
 
-        return updated;
+            return false;
+        }
     }
 
 
-    // =========================================================
-    // 5. DELETE ORDER
-    // =========================================================
+    // =====================================================
+    // DELETE ORDER
+    // =====================================================
 
-    public boolean deleteOrder(int orderId) {
+    public boolean deleteOrder(
+            int orderId) {
 
-        Connection con = null;
+        String sql =
+                "DELETE FROM orders " +
+                "WHERE order_id=?";
 
-        PreparedStatement itemPst = null;
-        PreparedStatement orderPst = null;
+        try (
+                Connection con =
+                        DBConnection.getConnection();
 
-        boolean deleted = false;
+                PreparedStatement pst =
+                        con.prepareStatement(sql)
+        ) {
 
-        try {
-
-            con = DBConnection.getConnection();
-
-            con.setAutoCommit(false);
-
-
-            // =================================================
-            // DELETE ORDER ITEMS FIRST
-            // =================================================
-
-            String itemSQL =
-                    "DELETE FROM order_items " +
-                    "WHERE order_id=?";
-
-            itemPst =
-                    con.prepareStatement(itemSQL);
-
-            itemPst.setInt(
+            pst.setInt(
                     1,
                     orderId
             );
 
-            itemPst.executeUpdate();
-
-
-            // =================================================
-            // DELETE ORDER
-            // =================================================
-
-            String orderSQL =
-                    "DELETE FROM orders " +
-                    "WHERE order_id=?";
-
-            orderPst =
-                    con.prepareStatement(orderSQL);
-
-            orderPst.setInt(
-                    1,
-                    orderId
-            );
-
-            int rows =
-                    orderPst.executeUpdate();
-
-
-            if (rows > 0) {
-
-                con.commit();
-
-                deleted = true;
-
-            } else {
-
-                con.rollback();
-            }
-
+            return pst.executeUpdate() > 0;
 
         } catch (Exception e) {
 
             e.printStackTrace();
 
-            try {
-
-                if (con != null) {
-
-                    con.rollback();
-                }
-
-            } catch (Exception rollbackException) {
-
-                rollbackException.printStackTrace();
-            }
-
-
-        } finally {
-
-            try {
-
-                if (itemPst != null) {
-                    itemPst.close();
-                }
-
-                if (orderPst != null) {
-                    orderPst.close();
-                }
-
-                if (con != null) {
-
-                    con.setAutoCommit(true);
-
-                    con.close();
-                }
-
-            } catch (Exception closeException) {
-
-                closeException.printStackTrace();
-            }
+            return false;
         }
-
-        return deleted;
     }
 }

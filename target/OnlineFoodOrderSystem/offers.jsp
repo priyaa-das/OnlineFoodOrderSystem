@@ -1,271 +1,619 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+
+<%@page import="java.util.List"%>
+<%@page import="com.foodexpress.model.User"%>
+<%@page import="com.foodexpress.model.Cart"%>
+<%@page import="com.foodexpress.dao.CartDAO"%>
+
+<%
+    // =====================================================
+    // LOGIN CHECK
+    // =====================================================
+
+    User user =
+            (User) session.getAttribute("user");
+
+    if (user == null) {
+
+        response.sendRedirect("login.jsp");
+
+        return;
+    }
+
+
+    // =====================================================
+    // GET CART
+    // =====================================================
+
+    CartDAO cartDAO =
+            new CartDAO();
+
+    List<Cart> cartList =
+            cartDAO.getCartItems(
+                    user.getUserId()
+            );
+
+
+    // =====================================================
+    // CALCULATE SUBTOTAL
+    // =====================================================
+
+    double subtotal = 0;
+
+    for (Cart cart : cartList) {
+
+        subtotal +=
+                cart.getPrice()
+                * cart.getQuantity();
+    }
+
+
+    // =====================================================
+    // CLAIMED OFFER
+    // =====================================================
+
+    String claimedOffer =
+            (String) session.getAttribute(
+                    "claimedOffer"
+            );
+
+
+    String message =
+            (String) session.getAttribute(
+                    "offerMessage"
+            );
+
+    session.removeAttribute(
+            "offerMessage"
+    );
+
+
+    // =====================================================
+    // ELIGIBILITY
+    // =====================================================
+
+    boolean food200Eligible =
+            subtotal >= 1500;
+
+    boolean freeDeliveryEligible =
+            subtotal >= 2000;
+
+    boolean food10Eligible =
+            subtotal >= 2500;
+
+%>
+
 <!DOCTYPE html>
-<html lang="en">
+
+<html>
 
 <head>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>FoodExpress | Special Offers</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="css/style.css">
+    <title>Offers | FoodExpress</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: #f5f8fc;
+            color: #1e293b;
+        }
+
+        .navbar {
+            background: #2196F3;
+            padding: 18px 55px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            color: white;
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            list-style: none;
+            margin: 0;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .hero {
+            margin: 35px 55px;
+            padding: 45px;
+            text-align: center;
+
+            border-radius: 20px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #2196F3,
+                    #64B5F6
+                );
+
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 35px;
+            margin: 0 0 10px;
+        }
+
+        .cart-total {
+            background: white;
+            color: #1976D2;
+
+            display: inline-block;
+
+            padding: 10px 20px;
+
+            border-radius: 25px;
+
+            font-weight: 600;
+
+            margin-top: 10px;
+        }
+
+        .message {
+            max-width: 750px;
+
+            margin: 20px auto;
+
+            padding: 15px;
+
+            text-align: center;
+
+            background: #dcfce7;
+
+            color: #166534;
+
+            border-radius: 10px;
+        }
+
+        .offers {
+            padding: 10px 55px 50px;
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fit, minmax(280px, 1fr));
+
+            gap: 25px;
+        }
+
+        .offer-card {
+            background: white;
+
+            padding: 30px;
+
+            text-align: center;
+
+            border-radius: 18px;
+
+            box-shadow:
+                0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        .offer-icon {
+            font-size: 48px;
+        }
+
+        .offer-card h2 {
+            color: #1976D2;
+        }
+
+        .offer-card p {
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        .code {
+            display: inline-block;
+
+            padding: 8px 15px;
+
+            background: #eff6ff;
+
+            border: 1px dashed #2196F3;
+
+            color: #1976D2;
+
+            border-radius: 7px;
+
+            font-weight: 600;
+        }
+
+        .claim-btn {
+            display: block;
+
+            margin-top: 20px;
+
+            padding: 12px;
+
+            background: #2196F3;
+
+            color: white;
+
+            text-decoration: none;
+
+            border-radius: 8px;
+
+            font-weight: 600;
+        }
+
+        .claim-btn:hover {
+            background: #1976D2;
+        }
+
+        .claimed {
+            display: block;
+
+            margin-top: 20px;
+
+            padding: 12px;
+
+            background: #dcfce7;
+
+            color: #166534;
+
+            border-radius: 8px;
+
+            font-weight: 600;
+        }
+
+        .locked {
+            display: block;
+
+            margin-top: 20px;
+
+            padding: 12px;
+
+            background: #f1f5f9;
+
+            color: #64748b;
+
+            border-radius: 8px;
+        }
+
+        .back-btn {
+            display: block;
+
+            width: 200px;
+
+            margin: 0 auto 50px;
+
+            padding: 12px;
+
+            text-align: center;
+
+            background: #334155;
+
+            color: white;
+
+            text-decoration: none;
+
+            border-radius: 8px;
+        }
+
+    </style>
 
 </head>
 
 <body>
 
-<!-- ================= NAVBAR ================= -->
+
+<!-- NAVBAR -->
 
 <nav class="navbar">
 
     <div class="logo">
-
         FoodExpress
-
     </div>
 
     <ul class="nav-links">
 
-        <li><a href="index.jsp">Home</a></li>
+        <li>
+            <a href="userHome.jsp">
+                Home
+            </a>
+        </li>
 
-        <li><a href="menu.jsp">Menu</a></li>
+        <li>
+            <a href="MenuServlet">
+                Menu
+            </a>
+        </li>
 
-        <li><a href="offers.jsp">Offers</a></li>
+        <li>
+            <a href="CartServlet">
+                Cart
+            </a>
+        </li>
 
-        <li><a href="about.jsp">About</a></li>
+        <li>
+            <a href="OrderHistoryServlet">
+                Orders
+            </a>
+        </li>
 
-        <li><a href="contact.jsp">Contact</a></li>
-
-        <li><a href="login.jsp" class="login-btn">Login</a></li>
+        <li>
+            <a href="LogoutServlet">
+                Logout
+            </a>
+        </li>
 
     </ul>
 
 </nav>
 
-<!-- ================= PAGE HEADER ================= -->
 
-<section class="page-banner">
+<!-- HERO -->
 
-    <div class="banner-content">
+<section class="hero">
 
-        <h1>Exclusive Offers</h1>
+    <h1>
+        Exclusive Offers
+    </h1>
 
-        <p>
-
-            Enjoy delicious meals at amazing prices with our exclusive promotions.
-
-        </p>
-
-    </div>
-
-</section>
-
-<!-- ================= OFFERS ================= -->
-
-<section class="offers-page">
-
-    <div class="offer-card">
-
-        <h2>Weekend Special</h2>
-
-        <h3>20% OFF</h3>
-
-        <p>
-
-            Enjoy a 20% discount on all premium meals every Friday and Saturday.
-
-        </p>
-
-        <span class="coupon">
-
-            Code : WEEKEND20
-
-        </span>
-
-        <button>Claim Offer</button>
-
-    </div>
-
-
-
-    <div class="offer-card">
-
-        <h2>Student Discount</h2>
-
-        <h3>15% OFF</h3>
-
-        <p>
-
-            Show your valid student ID and receive an instant discount.
-
-        </p>
-
-        <span class="coupon">
-
-            Code : STUDENT15
-
-        </span>
-
-        <button>Claim Offer</button>
-
-    </div>
-
-
-
-    <div class="offer-card">
-
-        <h2>Buy 2 Get 1 Free</h2>
-
-        <h3>Limited Offer</h3>
-
-        <p>
-
-            Purchase any two selected meals and get another one absolutely free.
-
-        </p>
-
-        <span class="coupon">
-
-            Code : BUY2GET1
-
-        </span>
-
-        <button>Claim Offer</button>
-
-    </div>
-        <div class="offer-card">
-
-        <h2>Free Delivery</h2>
-
-        <h3>Orders Above ৳1000</h3>
-
-        <p>
-
-            Get free home delivery on all orders above ৳1000 within selected locations.
-
-        </p>
-
-        <span class="coupon">
-
-            Code : FREEDELIVERY
-
-        </span>
-
-        <button>Claim Offer</button>
-
-    </div>
-
-</section>
-
-
-<!-- ================= PROMOTION BANNER ================= -->
-
-<section class="promo-banner">
-
-    <div class="promo-content">
-
-        <h2>Limited Time Promotion</h2>
-
-        <p>
-
-            Order your favourite meals today and enjoy exclusive discounts before the offer expires.
-
-        </p>
-
-        <h3>Promo Code : FOOD20</h3>
-
-        <a href="menu.jsp" class="primary-btn">
-
-            Order Now
-
-        </a>
-
-    </div>
-
-</section>
-
-
-<!-- ================= TERMS & CONDITIONS ================= -->
-
-<section class="terms-section">
-
-    <h2>Terms & Conditions</h2>
-
-    <ul>
-
-        <li>Each promotional code can be used only once per customer.</li>
-
-        <li>Offers cannot be combined with other promotional campaigns.</li>
-
-        <li>Student Discount requires a valid student ID.</li>
-
-        <li>Free Delivery applies only to eligible delivery areas.</li>
-
-        <li>FoodExpress reserves the right to modify or cancel offers without prior notice.</li>
-
-    </ul>
-
-</section>
-
-
-<!-- ================= FOOTER ================= -->
-
-<footer>
-
-    <div class="footer-container">
-
-        <div class="footer-box">
-
-            <h3>FoodExpress</h3>
-
-            <p>
-
-                Premium Online Food Ordering System delivering quality food with excellent service.
-
-            </p>
-
-        </div>
-
-        <div class="footer-box">
-
-            <h3>Quick Links</h3>
-
-            <a href="index.jsp">Home</a>
-
-            <a href="menu.jsp">Menu</a>
-
-            <a href="offers.jsp">Offers</a>
-
-            <a href="contact.jsp">Contact</a>
-
-        </div>
-
-        <div class="footer-box">
-
-            <h3>Contact</h3>
-
-            <p>Email : info@foodexpress.com</p>
-
-            <p>Phone : +880 1700-123456</p>
-
-            <p>Sylhet, Bangladesh</p>
-
-        </div>
-
-    </div>
-
-    <hr>
-
-    <p class="copyright">
-
-        © 2026 FoodExpress. All Rights Reserved.
-
+    <p>
+        Hello <strong><%=user.getFullName()%></strong>,
+        offers are based on your current cart.
     </p>
 
-</footer>
+    <div class="cart-total">
+
+        Current Cart:
+        ৳<%=String.format("%.2f", subtotal)%>
+
+    </div>
+
+</section>
+
+
+<!-- MESSAGE -->
+
+<%
+    if (message != null) {
+%>
+
+<div class="message">
+
+    <%=message%>
+
+</div>
+
+<%
+    }
+%>
+
+
+<!-- OFFERS -->
+
+<section class="offers">
+
+
+    <!-- FOOD200 -->
+
+    <div class="offer-card">
+
+        <div class="offer-icon">
+            🎁
+        </div>
+
+        <h2>
+            ৳200 OFF
+        </h2>
+
+        <p>
+            Get ৳200 discount on orders
+            above ৳1500.
+        </p>
+
+        <div class="code">
+            FOOD200
+        </div>
+
+        <%
+            if ("FOOD200".equals(claimedOffer)) {
+        %>
+
+            <span class="claimed">
+                ✓ Claimed
+            </span>
+
+        <%
+            } else if (food200Eligible) {
+        %>
+
+            <a href="ClaimOfferServlet?offer=FOOD200"
+               class="claim-btn">
+
+                Claim ৳200 OFF
+
+            </a>
+
+        <%
+            } else {
+        %>
+
+            <span class="locked">
+
+                🔒 Add ৳<%=
+                    String.format(
+                        "%.2f",
+                        1500 - subtotal
+                    )
+                %>
+                more to unlock
+
+            </span>
+
+        <%
+            }
+        %>
+
+    </div>
+
+
+    <!-- FREE DELIVERY -->
+
+    <div class="offer-card">
+
+        <div class="offer-icon">
+            🚚
+        </div>
+
+        <h2>
+            Free Delivery
+        </h2>
+
+        <p>
+            Get free delivery on orders
+            above ৳2000.
+        </p>
+
+        <div class="code">
+            FREEDELIVERY
+        </div>
+
+        <%
+            if ("FREEDELIVERY".equals(claimedOffer)) {
+        %>
+
+            <span class="claimed">
+                ✓ Claimed
+            </span>
+
+        <%
+            } else if (freeDeliveryEligible) {
+        %>
+
+            <a href="ClaimOfferServlet?offer=FREEDELIVERY"
+               class="claim-btn">
+
+                Claim Free Delivery
+
+            </a>
+
+        <%
+            } else {
+        %>
+
+            <span class="locked">
+
+                🔒 Add ৳<%=
+                    String.format(
+                        "%.2f",
+                        2000 - subtotal
+                    )
+                %>
+                more to unlock
+
+            </span>
+
+        <%
+            }
+        %>
+
+    </div>
+
+
+    <!-- FOOD10 -->
+
+    <div class="offer-card">
+
+        <div class="offer-icon">
+            🍔
+        </div>
+
+        <h2>
+            10% OFF
+        </h2>
+
+        <p>
+            Get 10% discount on orders
+            above ৳2500.
+        </p>
+
+        <div class="code">
+            FOOD10
+        </div>
+
+        <%
+            if ("FOOD10".equals(claimedOffer)) {
+        %>
+
+            <span class="claimed">
+                ✓ Claimed
+            </span>
+
+        <%
+            } else if (food10Eligible) {
+        %>
+
+            <a href="ClaimOfferServlet?offer=FOOD10"
+               class="claim-btn">
+
+                Claim 10% OFF
+
+            </a>
+
+        <%
+            } else {
+        %>
+
+            <span class="locked">
+
+                🔒 Add ৳<%=
+                    String.format(
+                        "%.2f",
+                        2500 - subtotal
+                    )
+                %>
+                more to unlock
+
+            </span>
+
+        <%
+            }
+        %>
+
+    </div>
+
+
+</section>
+
+
+<a href="userHome.jsp"
+   class="back-btn">
+
+    ← Back to Dashboard
+
+</a>
+
 
 </body>
+
 </html>

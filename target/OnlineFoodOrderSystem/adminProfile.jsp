@@ -2,10 +2,8 @@
 <%@page import="com.foodexpress.model.User"%>
 
 <%
-    // Get logged-in ADMIN
     User admin = (User) session.getAttribute("admin");
 
-    // Admin login check
     if (admin == null) {
         response.sendRedirect("adminLogin.jsp");
         return;
@@ -24,124 +22,311 @@
 
     <title>Admin Profile | FoodExpress</title>
 
-    <link rel="stylesheet"
-          href="css/style.css">
-
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet">
-
     <style>
 
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            background: #f5f9fc;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7ff;
+            color: #1e293b;
         }
 
-        .profile-section {
-            min-height: 75vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 50px 20px;
-        }
+        /* ================= NAVBAR ================= */
 
-        .profile-card {
-            width: 520px;
-            background: white;
-            border-radius: 22px;
-            padding: 40px;
-            box-shadow: 0 10px 35px rgba(0,0,0,0.10);
-        }
-
-        .profile-title {
-            text-align: center;
-            color: #1677b8;
-            font-size: 30px;
-            margin-bottom: 30px;
-        }
-
-        .profile-icon {
-            width: 90px;
+        .navbar {
             height: 90px;
-            border-radius: 50%;
-            background: #49a7e8;
-            color: white;
+            background: #2196F3;
+
             display: flex;
-            justify-content: center;
             align-items: center;
-            margin: 0 auto 25px;
-            font-size: 38px;
-            font-weight: 600;
+            justify-content: space-between;
+
+            padding: 0 45px;
+
+            box-shadow: 0 4px 15px rgba(0,0,0,0.12);
         }
 
-        .profile-item {
-            padding: 15px 0;
-            border-bottom: 1px solid #eeeeee;
+        .logo {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
         }
 
-        .profile-item:last-child {
-            border-bottom: none;
-        }
-
-        .profile-label {
-            display: block;
-            color: #777;
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
-
-        .profile-value {
-            color: #222;
-            font-size: 17px;
-            font-weight: 500;
-        }
-
-        .admin-badge {
-            display: inline-block;
-            background: #e8f5ff;
-            color: #1677b8;
-            padding: 6px 15px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .profile-buttons {
+        .nav-right {
             display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 30px;
+            gap: 12px;
         }
 
-        .profile-btn {
+        .nav-btn {
             text-decoration: none;
-            padding: 12px 24px;
-            border-radius: 10px;
+            color: white;
+
+            padding: 11px 18px;
+
+            border-radius: 7px;
+
             font-weight: 600;
+
             transition: 0.2s;
         }
 
-        .back-btn {
-            background: #49a7e8;
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        /* ================= PAGE ================= */
+
+        .page-container {
+            max-width: 1000px;
+
+            margin: 45px auto;
+
+            padding: 0 25px;
+        }
+
+        /* ================= PROFILE CARD ================= */
+
+        .profile-card {
+
+            background: white;
+
+            border-radius: 20px;
+
+            padding: 45px;
+
+            box-shadow:
+                0 10px 35px rgba(0,0,0,0.08);
+        }
+
+        /* ================= HEADER ================= */
+
+        .profile-header {
+
+            text-align: center;
+
+            margin-bottom: 40px;
+        }
+
+        .avatar {
+
+            width: 110px;
+            height: 110px;
+
+            margin: 0 auto 18px;
+
+            border-radius: 50%;
+
+            background: #2196F3;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: white;
+
+            font-size: 48px;
+            font-weight: bold;
+
+            box-shadow:
+                0 8px 20px rgba(33,150,243,0.3);
+        }
+
+        .profile-header h1 {
+
+            margin: 5px 0;
+
+            font-size: 32px;
+        }
+
+        .profile-header p {
+
+            margin: 8px 0;
+
+            color: #64748b;
+
+            font-size: 16px;
+        }
+
+        /* ================= INFO GRID ================= */
+
+        .info-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 22px;
+        }
+
+        .info-box {
+
+            background: #f8fafc;
+
+            border: 1px solid #e2e8f0;
+
+            border-radius: 12px;
+
+            padding: 22px;
+
+            transition: 0.2s;
+        }
+
+        .info-box:hover {
+
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 5px 15px rgba(0,0,0,0.06);
+        }
+
+        .label {
+
+            display: block;
+
+            color: #64748b;
+
+            font-size: 14px;
+
+            margin-bottom: 8px;
+        }
+
+        .value {
+
+            font-size: 18px;
+
+            font-weight: 600;
+
+            color: #0f172a;
+
+            word-break: break-word;
+        }
+
+        /* ================= ROLE ================= */
+
+        .role-badge {
+
+            display: inline-block;
+
+            background: #e0f2fe;
+
+            color: #0284c7;
+
+            padding: 7px 14px;
+
+            border-radius: 20px;
+
+            font-size: 14px;
+
+            font-weight: bold;
+        }
+
+        /* ================= BUTTONS ================= */
+
+        .action-buttons {
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 15px;
+
+            margin-top: 40px;
+
+            flex-wrap: wrap;
+        }
+
+        .btn {
+
+            display: inline-block;
+
+            text-decoration: none;
+
+            border: none;
+
+            cursor: pointer;
+
+            padding: 13px 25px;
+
+            border-radius: 8px;
+
+            font-size: 15px;
+
+            font-weight: 600;
+
+            transition: 0.2s;
+        }
+
+        .edit-btn {
+
+            background: #2196F3;
+
             color: white;
         }
 
+        .edit-btn:hover {
+
+            background: #1976D2;
+
+            transform: translateY(-2px);
+        }
+
+        .back-btn {
+
+            background: #e2e8f0;
+
+            color: #334155;
+        }
+
         .back-btn:hover {
-            background: #278ed2;
+
+            background: #cbd5e1;
         }
 
         .logout-btn {
-            background: #f1f1f1;
-            color: #333;
+
+            background: #ef4444;
+
+            color: white;
         }
 
         .logout-btn:hover {
-            background: #ddd;
+
+            background: #dc2626;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media(max-width: 700px) {
+
+            .navbar {
+
+                padding: 0 20px;
+            }
+
+            .logo {
+
+                font-size: 22px;
+            }
+
+            .info-grid {
+
+                grid-template-columns: 1fr;
+            }
+
+            .profile-card {
+
+                padding: 25px;
+            }
         }
 
     </style>
 
 </head>
-
 
 <body>
 
@@ -151,153 +336,185 @@
 <nav class="navbar">
 
     <div class="logo">
-        FoodExpress
+        FoodExpress Admin
     </div>
 
+    <div class="nav-right">
 
-    <ul class="nav-links">
+        <a href="adminDashboard.jsp"
+           class="nav-btn">
+            Dashboard
+        </a>
 
-        <li>
-            <a href="adminDashboard.jsp">
-                Dashboard
-            </a>
-        </li>
+        <a href="LogoutServlet"
+           class="nav-btn">
+            Logout
+        </a>
 
-        <li>
-            <a href="AdminFoodServlet">
-                Manage Food
-            </a>
-        </li>
-
-        <li>
-            <a href="ManageOrderServlet">
-                Manage Orders
-            </a>
-        </li>
-
-        <li>
-            <a href="ViewUsersServlet">
-                View Users
-            </a>
-        </li>
-
-        <li>
-            <a href="adminProfile.jsp"
-               class="active">
-                Profile
-            </a>
-        </li>
-
-        <li>
-            <a href="LogoutServlet"
-               class="login-btn">
-                Logout
-            </a>
-        </li>
-
-    </ul>
+    </div>
 
 </nav>
 
 
-<!-- ================= PROFILE ================= -->
+<!-- ================= PAGE ================= -->
 
-<section class="profile-section">
+<div class="page-container">
 
     <div class="profile-card">
 
 
-        <div class="profile-icon">
-            👤
-        </div>
+        <!-- ================= PROFILE HEADER ================= -->
 
+        <div class="profile-header">
 
-        <h2 class="profile-title">
-            Admin Profile
-        </h2>
+            <div class="avatar">
+                <%= admin.getFullName().substring(0,1).toUpperCase() %>
+            </div>
 
+            <h1>
+                <%= admin.getFullName() %>
+            </h1>
 
-        <!-- NAME -->
-
-        <div class="profile-item">
-
-            <span class="profile-label">
-                Full Name
-            </span>
-
-            <span class="profile-value">
-                <%=admin.getFullName()%>
-            </span>
+            <p>
+                FoodExpress Administrator
+            </p>
 
         </div>
 
 
-        <!-- EMAIL -->
+        <!-- ================= INFORMATION ================= -->
 
-        <div class="profile-item">
+        <div class="info-grid">
 
-            <span class="profile-label">
-                Email
-            </span>
 
-            <span class="profile-value">
-                <%=admin.getEmail()%>
-            </span>
+            <div class="info-box">
+
+                <span class="label">
+                    Full Name
+                </span>
+
+                <div class="value">
+                    <%= admin.getFullName() %>
+                </div>
+
+            </div>
+
+
+            <div class="info-box">
+
+                <span class="label">
+                    Email
+                </span>
+
+                <div class="value">
+                    <%= admin.getEmail() %>
+                </div>
+
+            </div>
+
+
+            <div class="info-box">
+
+                <span class="label">
+                    Phone
+                </span>
+
+                <div class="value">
+
+                    <%
+                        String phone = admin.getPhone();
+
+                        if (phone == null ||
+                            phone.trim().isEmpty()) {
+                    %>
+
+                        Not Provided
+
+                    <%
+                        } else {
+                    %>
+
+                        <%= phone %>
+
+                    <%
+                        }
+                    %>
+
+                </div>
+
+            </div>
+
+
+            <div class="info-box">
+
+                <span class="label">
+                    Role
+                </span>
+
+                <div class="value">
+
+                    <span class="role-badge">
+                        Administrator
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="info-box"
+                 style="grid-column: 1 / -1;">
+
+                <span class="label">
+                    Address
+                </span>
+
+                <div class="value">
+
+                    <%
+                        String address = admin.getAddress();
+
+                        if (address == null ||
+                            address.trim().isEmpty()) {
+                    %>
+
+                        Not Provided
+
+                    <%
+                        } else {
+                    %>
+
+                        <%= address %>
+
+                    <%
+                        }
+                    %>
+
+                </div>
+
+            </div>
+
 
         </div>
 
 
-        <!-- PHONE -->
+        <!-- ================= BUTTONS ================= -->
 
-        <div class="profile-item">
-
-            <span class="profile-label">
-                Phone
-            </span>
-
-            <span class="profile-value">
-                <%=admin.getPhone()%>
-            </span>
-
-        </div>
+        <div class="action-buttons">
 
 
-        <!-- ADDRESS -->
+            <!-- NEW EDIT BUTTON -->
 
-        <div class="profile-item">
+            <a href="editAdminProfile.jsp"
+               class="btn edit-btn">
 
-            <span class="profile-label">
-                Address
-            </span>
+                Edit Profile
 
-            <span class="profile-value">
-                <%=admin.getAddress()%>
-            </span>
+            </a>
 
-        </div>
-
-
-        <!-- ROLE -->
-
-        <div class="profile-item">
-
-            <span class="profile-label">
-                Account Type
-            </span>
-
-            <span class="admin-badge">
-                Administrator
-            </span>
-
-        </div>
-
-
-        <!-- BUTTONS -->
-
-        <div class="profile-buttons">
 
             <a href="adminDashboard.jsp"
-               class="profile-btn back-btn">
+               class="btn back-btn">
 
                 Back to Dashboard
 
@@ -305,7 +522,7 @@
 
 
             <a href="LogoutServlet"
-               class="profile-btn logout-btn">
+               class="btn logout-btn">
 
                 Logout
 
@@ -316,86 +533,9 @@
 
     </div>
 
-</section>
-
-
-<!-- ================= FOOTER ================= -->
-
-<footer>
-
-    <div class="footer-container">
-
-        <div class="footer-box">
-
-            <h3>
-                FoodExpress
-            </h3>
-
-            <p>
-                Fresh food, fast delivery and
-                premium dining experience.
-            </p>
-
-        </div>
-
-
-        <div class="footer-box">
-
-            <h3>
-                Quick Links
-            </h3>
-
-            <a href="adminDashboard.jsp">
-                Dashboard
-            </a>
-
-            <a href="AdminFoodServlet">
-                Manage Food
-            </a>
-
-            <a href="ManageOrderServlet">
-                Manage Orders
-            </a>
-
-            <a href="ViewUsersServlet">
-                View Users
-            </a>
-
-        </div>
-
-
-        <div class="footer-box">
-
-            <h3>
-                Contact
-            </h3>
-
-            <p>
-                Email : info@foodexpress.com
-            </p>
-
-            <p>
-                Phone : +880 1700-123456
-            </p>
-
-            <p>
-                Sylhet, Bangladesh
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <hr>
-
-
-    <p class="copyright">
-        © 2026 FoodExpress. All Rights Reserved.
-    </p>
-
-</footer>
+</div>
 
 
 </body>
+
 </html>

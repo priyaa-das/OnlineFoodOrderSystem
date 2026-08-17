@@ -17,70 +17,77 @@ import java.util.List;
 @WebServlet("/OrderHistoryServlet")
 public class OrderHistoryServlet extends HttpServlet {
 
-    // ==========================================
-    // GET ORDER HISTORY
-    // ==========================================
-
     @Override
     protected void doGet(
             HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession();
+        System.out.println("========== ORDER HISTORY SERVLET ==========");
 
-        User user = (User) session.getAttribute("user");
+        // ==============================
+        // GET SESSION
+        // ==============================
 
-        // User login check
-        if (user == null) {
+        HttpSession session = request.getSession(false);
+
+        if (session == null) {
             response.sendRedirect("login.jsp");
             return;
         }
 
-        try {
+        // ==============================
+        // GET LOGGED-IN USER
+        // ==============================
 
-            int userId = user.getUserId();
+        User user = (User) session.getAttribute("user");
 
-            OrderDAO orderDAO = new OrderDAO();
+        if (user == null) {
 
-            List<Order> orderList =
-                    orderDAO.getOrdersByUser(userId);
+            System.out.println("User not logged in.");
 
-            request.setAttribute(
-                    "orderList",
-                    orderList
-            );
-
-            request.getRequestDispatcher(
-                    "orderHistory.jsp"
-            ).forward(request, response);
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-
-            request.setAttribute(
-                    "error",
-                    "Unable to load order history."
-            );
-
-            request.getRequestDispatcher(
-                    "orderHistory.jsp"
-            ).forward(request, response);
+            response.sendRedirect("login.jsp");
+            return;
         }
-    }
 
+        System.out.println(
+                "Logged-in User ID = "
+                + user.getUserId()
+        );
 
-    // ==========================================
-    // POST
-    // ==========================================
+        // ==============================
+        // GET ORDERS
+        // ==============================
 
-    @Override
-    protected void doPost(
-            HttpServletRequest request,
-            HttpServletResponse response)
-            throws ServletException, IOException {
+        OrderDAO orderDAO = new OrderDAO();
 
-        doGet(request, response);
+        List<Order> orderList =
+                orderDAO.getOrdersByUser(
+                        user.getUserId()
+                );
+
+        System.out.println(
+                "Order Count = "
+                + (orderList == null
+                ? "null"
+                : orderList.size())
+        );
+
+        // ==============================
+        // SEND DATA TO JSP
+        // ==============================
+
+        request.setAttribute(
+                "orderList",
+                orderList
+        );
+
+        // ==============================
+        // OPEN ORDER HISTORY PAGE
+        // ==============================
+
+        request.getRequestDispatcher(
+                "orderHistory.jsp"
+        ).forward(request, response);
     }
 }

@@ -19,10 +19,8 @@ public class Order {
 
     private String orderDate;
 
-
     public Order() {
     }
-
 
     public int getOrderId() {
         return orderId;
@@ -32,7 +30,6 @@ public class Order {
         this.orderId = orderId;
     }
 
-
     public int getUserId() {
         return userId;
     }
@@ -40,7 +37,6 @@ public class Order {
     public void setUserId(int userId) {
         this.userId = userId;
     }
-
 
     public String getCustomerName() {
         return customerName;
@@ -50,7 +46,6 @@ public class Order {
         this.customerName = customerName;
     }
 
-
     public String getEmail() {
         return email;
     }
@@ -58,7 +53,6 @@ public class Order {
     public void setEmail(String email) {
         this.email = email;
     }
-
 
     public String getPhone() {
         return phone;
@@ -68,7 +62,6 @@ public class Order {
         this.phone = phone;
     }
 
-
     public double getTotalAmount() {
         return totalAmount;
     }
@@ -77,7 +70,6 @@ public class Order {
         this.totalAmount = totalAmount;
     }
 
-
     public String getStatus() {
         return status;
     }
@@ -85,7 +77,6 @@ public class Order {
     public void setStatus(String status) {
         this.status = status;
     }
-
 
     public String getOrderStatus() {
         return orderStatus;
@@ -96,7 +87,6 @@ public class Order {
         this.status = orderStatus;
     }
 
-
     public String getPaymentStatus() {
         return paymentStatus;
     }
@@ -105,7 +95,6 @@ public class Order {
         this.paymentStatus = paymentStatus;
     }
 
-
     public String getDeliveryAddress() {
         return deliveryAddress;
     }
@@ -113,7 +102,6 @@ public class Order {
     public void setDeliveryAddress(String deliveryAddress) {
         this.deliveryAddress = deliveryAddress;
     }
-
 
     public String getOrderDate() {
         return orderDate;

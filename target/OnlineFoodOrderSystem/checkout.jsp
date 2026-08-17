@@ -1,39 +1,134 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="java.util.*"%>
+
+<%@page import="java.util.List"%>
 <%@page import="com.foodexpress.model.User"%>
 <%@page import="com.foodexpress.model.Cart"%>
+<%@page import="com.foodexpress.dao.CartDAO"%>
 
 <%
-    User user = (User) session.getAttribute("user");
+    // =====================================================
+    // LOGIN CHECK
+    // =====================================================
+
+    User user =
+            (User) session.getAttribute("user");
 
     if (user == null) {
+
         response.sendRedirect("login.jsp");
+
         return;
     }
 
+
+    // =====================================================
+    // CART
+    // =====================================================
+
+    CartDAO cartDAO =
+            new CartDAO();
+
     List<Cart> cartList =
-            (List<Cart>) request.getAttribute("cartList");
+            cartDAO.getCartItems(
+                    user.getUserId()
+            );
 
-    Double subtotal =
-            (Double) request.getAttribute("subtotal");
 
-    Double deliveryCharge =
-            (Double) request.getAttribute("deliveryCharge");
+    double subtotal = 0;
 
-    Double vat =
-            (Double) request.getAttribute("vat");
+    for (Cart cart : cartList) {
 
-    Double grandTotal =
-            (Double) request.getAttribute("grandTotal");
+        subtotal +=
+                cart.getPrice()
+                * cart.getQuantity();
+    }
 
-    if (subtotal == null) subtotal = 0.0;
-    if (deliveryCharge == null) deliveryCharge = 0.0;
-    if (vat == null) vat = 0.0;
-    if (grandTotal == null) grandTotal = 0.0;
+
+    // =====================================================
+    // CLAIMED OFFER
+    // =====================================================
+
+    String claimedOffer =
+            (String) session.getAttribute(
+                    "claimedOffer"
+            );
+
+
+    double discount = 0;
+
+    double deliveryCharge = 60;
+
+    String offerText =
+            "No offer applied";
+
+
+    // =====================================================
+    // APPLY OFFER
+    // =====================================================
+
+    if ("FOOD200".equals(claimedOffer)
+            && subtotal >= 1500) {
+
+        discount = 200;
+
+        offerText =
+                "FOOD200 - ৳200 OFF";
+    }
+
+    else if ("FREEDELIVERY".equals(
+            claimedOffer)
+            && subtotal >= 2000) {
+
+        deliveryCharge = 0;
+
+        offerText =
+                "FREEDELIVERY";
+    }
+
+    else if ("FOOD10".equals(
+            claimedOffer)
+            && subtotal >= 2500) {
+
+        discount =
+                subtotal * 0.10;
+
+        offerText =
+                "FOOD10 - 10% OFF";
+    }
+
+
+    // =====================================================
+    // AUTOMATIC FREE DELIVERY
+    // =====================================================
+
+    if (subtotal >= 2000) {
+
+        deliveryCharge = 0;
+    }
+
+
+    double discountedSubtotal =
+            subtotal - discount;
+
+    if (discountedSubtotal < 0) {
+        discountedSubtotal = 0;
+    }
+
+
+    double vat =
+            discountedSubtotal * 0.05;
+
+
+    double grandTotal =
+            discountedSubtotal
+            + deliveryCharge
+            + vat;
+
 %>
 
 <!DOCTYPE html>
-<html lang="en">
+
+<html>
 
 <head>
 
@@ -44,98 +139,224 @@
 
     <title>Checkout | FoodExpress</title>
 
-    <link rel="stylesheet"
-          href="css/style.css">
-
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
           rel="stylesheet">
 
     <style>
 
-        .checkout-container {
-            max-width: 900px;
-            margin: 50px auto;
-            padding: 20px;
-        }
-
-        .checkout-box {
-            background: white;
-            padding: 35px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-        }
-
-        .checkout-box h1 {
-            margin-bottom: 30px;
-        }
-
-        .checkout-box h2 {
-            margin-top: 25px;
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 18px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 7px;
-            font-weight: 500;
-        }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+        * {
             box-sizing: border-box;
         }
 
-        .payment-option {
-            display: block;
-            padding: 15px;
-            margin-bottom: 12px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            cursor: pointer;
+        body {
+
+            margin: 0;
+
+            font-family: 'Poppins', sans-serif;
+
+            background: #f5f8fc;
+
+            color: #1e293b;
         }
 
-        .payment-option:hover {
-            background: #f8f8f8;
+        .navbar {
+
+            background: #2196F3;
+
+            padding: 18px 55px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
         }
 
-        .payment-option input {
-            margin-right: 10px;
+        .logo {
+
+            color: white;
+
+            font-size: 25px;
+
+            font-weight: 700;
         }
 
-        .summary {
-            margin-top: 30px;
+        .navbar a {
+
+            color: white;
+
+            text-decoration: none;
+        }
+
+        .container {
+
+            max-width: 1100px;
+
+            margin: 40px auto;
+
             padding: 20px;
-            background: #f8f8f8;
-            border-radius: 10px;
+
+            display: grid;
+
+            grid-template-columns:
+                1.3fr 0.7fr;
+
+            gap: 30px;
+        }
+
+        .box {
+
+            background: white;
+
+            padding: 30px;
+
+            border-radius: 15px;
+
+            box-shadow:
+                0 5px 20px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+
+            margin-top: 0;
+        }
+
+        label {
+
+            display: block;
+
+            margin-top: 18px;
+
+            margin-bottom: 6px;
+
+            font-weight: 500;
+        }
+
+        input,
+        textarea,
+        select {
+
+            width: 100%;
+
+            padding: 12px;
+
+            border: 1px solid #cbd5e1;
+
+            border-radius: 7px;
+
+            font-family: inherit;
+        }
+
+        textarea {
+
+            min-height: 100px;
+
+            resize: vertical;
         }
 
         .summary-row {
+
             display: flex;
+
             justify-content: space-between;
-            margin: 12px 0;
+
+            padding: 10px 0;
+
+            color: #475569;
         }
 
-        .grand-total {
-            font-size: 20px;
-            font-weight: bold;
+        .discount {
+
+            color: #16a34a;
+
+            font-weight: 600;
         }
 
-        .place-order-btn {
-            width: 100%;
-            padding: 15px;
-            margin-top: 25px;
-            border: none;
+        .offer {
+
+            padding: 12px;
+
+            background: #eff6ff;
+
+            color: #1976D2;
+
             border-radius: 8px;
-            cursor: pointer;
+
+            margin-bottom: 15px;
+
+            font-size: 14px;
+        }
+
+        hr {
+
+            border: none;
+
+            border-top: 1px solid #e2e8f0;
+
+            margin: 15px 0;
+        }
+
+        .total {
+
+            font-size: 20px;
+
+            color: #1976D2;
+
+            font-weight: 700;
+        }
+
+        button {
+
+            width: 100%;
+
+            margin-top: 25px;
+
+            padding: 13px;
+
+            border: none;
+
+            border-radius: 8px;
+
+            background: #2196F3;
+
+            color: white;
+
             font-size: 16px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+        }
+
+        button:hover {
+
+            background: #1976D2;
+        }
+
+        .back {
+
+            display: block;
+
+            margin-top: 15px;
+
+            text-align: center;
+
+            color: #1976D2;
+
+            text-decoration: none;
+        }
+
+        @media(max-width:800px) {
+
+            .container {
+
+                grid-template-columns: 1fr;
+            }
+
+            .navbar {
+
+                padding: 15px 20px;
+            }
         }
 
     </style>
@@ -144,7 +365,8 @@
 
 <body>
 
-<!-- ================= NAVBAR ================= -->
+
+<!-- NAVBAR -->
 
 <nav class="navbar">
 
@@ -152,281 +374,84 @@
         FoodExpress
     </div>
 
-    <ul class="nav-links">
-
-        <li>
-            <a href="userHome.jsp">
-                Dashboard
-            </a>
-        </li>
-
-        <li>
-            <a href="MenuServlet">
-                Menu
-            </a>
-        </li>
-
-        <li>
-            <a href="CartServlet">
-                My Cart
-            </a>
-        </li>
-
-        <li>
-            <a href="orderHistory.jsp">
-                My Orders
-            </a>
-        </li>
-
-        <li>
-            <a href="LogoutServlet"
-               class="login-btn">
-                Logout
-            </a>
-        </li>
-
-    </ul>
+    <a href="CartServlet">
+        ← Back to Cart
+    </a>
 
 </nav>
 
 
-<!-- ================= CHECKOUT ================= -->
-
-<section class="checkout-container">
-
-    <div class="checkout-box">
-
-        <h1>Checkout</h1>
+<div class="container">
 
 
-        <!-- ================= DELIVERY INFORMATION ================= -->
+    <!-- =========================================
+         CUSTOMER INFORMATION
+         ========================================= -->
 
-        <h2>Delivery Information</h2>
+    <div class="box">
+
+        <h1>
+            Checkout
+        </h1>
+
+        <p>
+            Complete your information to place
+            your FoodExpress order.
+        </p>
+
 
         <form action="PlaceOrderServlet"
               method="post">
 
-            <div class="form-group">
 
-                <label>Full Name</label>
-
-                <input type="text"
-                       value="<%=user.getFullName()%>"
-                       readonly>
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label>Email</label>
-
-                <input type="email"
-                       value="<%=user.getEmail()%>"
-                       readonly>
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label>Phone</label>
-
-                <input type="text"
-                       name="phone"
-                       value="<%=user.getPhone()%>"
-                       required>
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label>Delivery Address</label>
-
-                <textarea name="address"
-                          rows="4"
-                          required><%=user.getAddress() == null ? "" : user.getAddress()%></textarea>
-
-            </div>
-
-
-            <!-- ================= PAYMENT ================= -->
-
-            <h2>Payment Method</h2>
-
-
-            <label class="payment-option">
-
-                <input type="radio"
-                       name="paymentMethod"
-                       value="Cash on Delivery"
-                       required>
-
-                💵 Cash on Delivery
-
+            <label>
+                Phone Number
             </label>
 
+            <input type="text"
+                   name="phone"
+                   value="<%=user.getPhone()%>"
+                   required>
 
-            <label class="payment-option">
 
-                <input type="radio"
-                       name="paymentMethod"
-                       value="Bkash">
-
-                📱 Bkash
-
+            <label>
+                Delivery Address
             </label>
 
+            <textarea name="address"
+                      placeholder="Enter your delivery address"
+                      required></textarea>
 
-            <label class="payment-option">
 
-                <input type="radio"
-                       name="paymentMethod"
-                       value="Nagad">
-
-                📱 Nagad
-
+            <label>
+                Payment Method
             </label>
 
+            <select name="paymentMethod"
+                    required>
 
-            <label class="payment-option">
+                <option value="">
+                    Select Payment Method
+                </option>
 
-                <input type="radio"
-                       name="paymentMethod"
-                       value="Rocket">
+                <option value="Cash on Delivery">
+                    Cash on Delivery
+                </option>
 
-                📱 Rocket
+                <option value="Online Payment">
+                    Online Payment
+                </option>
 
-            </label>
-
-
-            <label class="payment-option">
-
-                <input type="radio"
-                       name="paymentMethod"
-                       value="Card">
-
-                💳 Card
-
-            </label>
+            </select>
 
 
-            <!-- ================= CARD INFORMATION ================= -->
+            <button type="submit">
 
-            <div id="cardSection"
-                 style="display:none; margin-top:20px;">
-
-                <h3>Card Information</h3>
-
-                <div class="form-group">
-
-                    <label>Card Number</label>
-
-                    <input type="text"
-                           name="cardNumber"
-                           placeholder="Enter card number"
-                           maxlength="19">
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>Card Holder Name</label>
-
-                    <input type="text"
-                           name="cardHolder"
-                           placeholder="Card holder name">
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>Expiry Date</label>
-
-                    <input type="text"
-                           name="expiry"
-                           placeholder="MM/YY"
-                           maxlength="5">
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>CVV</label>
-
-                    <input type="password"
-                           name="cvv"
-                           placeholder="CVV"
-                           maxlength="4">
-
-                </div>
-
-            </div>
-
-
-            <!-- ================= ORDER SUMMARY ================= -->
-
-            <h2>Order Summary</h2>
-
-            <div class="summary">
-
-                <div class="summary-row">
-
-                    <span>Subtotal</span>
-
-                    <span>
-                        ৳<%=String.format("%.2f", subtotal)%>
-                    </span>
-
-                </div>
-
-
-                <div class="summary-row">
-
-                    <span>Delivery Charge</span>
-
-                    <span>
-                        ৳<%=String.format("%.2f", deliveryCharge)%>
-                    </span>
-
-                </div>
-
-
-                <div class="summary-row">
-
-                    <span>VAT (5%)</span>
-
-                    <span>
-                        ৳<%=String.format("%.2f", vat)%>
-                    </span>
-
-                </div>
-
-
-                <hr>
-
-
-                <div class="summary-row grand-total">
-
-                    <span>Grand Total</span>
-
-                    <span>
-                        ৳<%=String.format("%.2f", grandTotal)%>
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <button type="submit"
-                    class="primary-btn place-order-btn">
-
-                Place Order
+                Place Order -
+                ৳<%=String.format(
+                    "%.2f",
+                    grandTotal
+                )%>
 
             </button>
 
@@ -434,48 +459,135 @@
 
     </div>
 
-</section>
+
+    <!-- =========================================
+         ORDER SUMMARY
+         ========================================= -->
+
+    <div class="box">
+
+        <h2>
+            Order Summary
+        </h2>
 
 
-<!-- ================= CARD JAVASCRIPT ================= -->
+        <div class="offer">
 
-<script>
+            <strong>
+                Applied Offer:
+            </strong>
 
-    const paymentMethods =
-        document.querySelectorAll(
-            'input[name="paymentMethod"]'
-        );
+            <br>
 
-    const cardSection =
-        document.getElementById(
-            "cardSection"
-        );
+            <%=offerText%>
+
+        </div>
 
 
-    paymentMethods.forEach(function(method) {
+        <div class="summary-row">
 
-        method.addEventListener(
-            "change",
-            function() {
+            <span>
+                Subtotal
+            </span>
 
-                if (this.value === "Card") {
+            <span>
+                ৳<%=String.format(
+                    "%.2f",
+                    subtotal
+                )%>
+            </span>
 
-                    cardSection.style.display =
-                        "block";
+        </div>
 
-                } else {
 
-                    cardSection.style.display =
-                        "none";
+        <div class="summary-row discount">
 
-                }
+            <span>
+                Discount
+            </span>
 
-            }
-        );
+            <span>
+                - ৳<%=String.format(
+                    "%.2f",
+                    discount
+                )%>
+            </span>
 
-    });
+        </div>
 
-</script>
+
+        <div class="summary-row">
+
+            <span>
+                Delivery
+            </span>
+
+            <span>
+
+                <%
+                    if (deliveryCharge == 0) {
+                %>
+
+                    <strong>
+                        FREE
+                    </strong>
+
+                <%
+                    } else {
+                %>
+
+                    ৳<%=String.format(
+                        "%.2f",
+                        deliveryCharge
+                    )%>
+
+                <%
+                    }
+                %>
+
+            </span>
+
+        </div>
+
+
+        <div class="summary-row">
+
+            <span>
+                VAT (5%)
+            </span>
+
+            <span>
+                ৳<%=String.format(
+                    "%.2f",
+                    vat
+                )%>
+            </span>
+
+        </div>
+
+
+        <hr>
+
+
+        <div class="summary-row total">
+
+            <span>
+                Grand Total
+            </span>
+
+            <span>
+                ৳<%=String.format(
+                    "%.2f",
+                    grandTotal
+                )%>
+            </span>
+
+        </div>
+
+
+    </div>
+
+</div>
 
 </body>
 

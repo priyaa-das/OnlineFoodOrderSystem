@@ -5,14 +5,23 @@
 <%@page import="com.foodexpress.model.Order"%>
 
 <%
-    User user = (User) session.getAttribute("user");
+    // =====================================================
+    // LOGIN CHECK
+    // =====================================================
+
+    User user =
+            (User) session.getAttribute("user");
 
     if (user == null) {
 
         response.sendRedirect("login.jsp");
-        return;
 
+        return;
     }
+
+    // =====================================================
+    // GET ORDERS FROM SERVLET
+    // =====================================================
 
     List<Order> orderList =
             (List<Order>) request.getAttribute("orderList");
@@ -37,148 +46,293 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
           rel="stylesheet">
 
-
     <style>
 
         body {
 
-            background: #f5f8fc;
-
-        }
-
-
-        /* ================= PAGE HEADER ================= */
-
-        .order-header {
-
-            padding: 45px 50px;
-
-            background: linear-gradient(
-                135deg,
-                #2196F3,
-                #1976D2
-            );
-
-            color: white;
-
-        }
-
-
-        .order-header h1 {
-
-            margin: 8px 0;
-
-            font-size: 36px;
-
-        }
-
-
-        .order-header p {
-
-            color: #e0f2fe;
-
             margin: 0;
 
-        }
+            font-family: 'Poppins', sans-serif;
 
-
-        .tagline {
-
-            font-size: 13px;
-
-            font-weight: 600;
-
-            letter-spacing: 1px;
-
-            text-transform: uppercase;
+            background: #f5f7fb;
 
         }
 
+        /* ================= NAVBAR ================= */
 
-        /* ================= ORDERS ================= */
+        .navbar {
 
-        .orders-section {
+            display: flex;
 
-            padding: 45px 50px;
+            justify-content: space-between;
 
-        }
+            align-items: center;
 
-
-        .orders-section h2 {
-
-            margin-top: 0;
-
-            color: #0f172a;
-
-        }
-
-
-        .orders-table-wrapper {
-
-            background: white;
-
-            border-radius: 15px;
-
-            overflow-x: auto;
-
-            box-shadow:
-                0 5px 20px rgba(15,23,42,0.07);
-
-        }
-
-
-        .orders-table {
-
-            width: 100%;
-
-            border-collapse: collapse;
-
-            min-width: 850px;
-
-        }
-
-
-        .orders-table th {
+            padding: 18px 45px;
 
             background: #2196F3;
 
+            box-shadow:
+                0 3px 12px rgba(0,0,0,0.12);
+
+        }
+
+        .logo {
+
             color: white;
 
-            padding: 16px;
+            font-size: 25px;
 
-            text-align: left;
+            font-weight: 700;
+
+        }
+
+        .nav-links {
+
+            display: flex;
+
+            list-style: none;
+
+            gap: 25px;
+
+            margin: 0;
+
+            padding: 0;
+
+        }
+
+        .nav-links a {
+
+            color: white;
+
+            text-decoration: none;
+
+            font-weight: 500;
+
+        }
+
+        .nav-links a:hover {
+
+            opacity: 0.85;
+
+        }
+
+        /* ================= HERO ================= */
+
+        .orders-hero {
+
+            padding: 55px 8%;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #e3f2fd,
+                    #ffffff
+                );
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 40px;
+
+        }
+
+        .hero-text {
+
+            max-width: 650px;
+
+        }
+
+        .hero-text .tagline {
+
+            color: #2196F3;
+
+            font-weight: 600;
+
+            font-size: 15px;
+
+        }
+
+        .hero-text h1 {
+
+            font-size: 42px;
+
+            margin: 12px 0;
+
+            color: #172033;
+
+        }
+
+        .hero-text p {
+
+            color: #64748b;
+
+            line-height: 1.7;
+
+        }
+
+        .hero-image img {
+
+            width: 330px;
+
+            height: 220px;
+
+            object-fit: cover;
+
+            border-radius: 18px;
+
+            box-shadow:
+                0 10px 30px rgba(0,0,0,0.15);
+
+        }
+
+        /* ================= ORDERS SECTION ================= */
+
+        .orders-section {
+
+            padding: 55px 8%;
+
+        }
+
+        .section-title {
+
+            margin-bottom: 30px;
+
+        }
+
+        .section-title h2 {
+
+            font-size: 30px;
+
+            margin-bottom: 5px;
+
+            color: #172033;
+
+        }
+
+        .section-title p {
+
+            color: #64748b;
+
+        }
+
+        /* ================= ORDER CARD ================= */
+
+        .order-card {
+
+            background: white;
+
+            border-radius: 16px;
+
+            margin-bottom: 25px;
+
+            padding: 28px;
+
+            box-shadow:
+                0 5px 20px rgba(0,0,0,0.07);
+
+            transition:
+                transform 0.2s,
+                box-shadow 0.2s;
+
+        }
+
+        .order-card:hover {
+
+            transform: translateY(-3px);
+
+            box-shadow:
+                0 10px 28px rgba(0,0,0,0.10);
+
+        }
+
+        .order-top {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            border-bottom: 1px solid #edf0f5;
+
+            padding-bottom: 18px;
+
+            margin-bottom: 20px;
+
+        }
+
+        .order-id {
+
+            font-size: 20px;
+
+            font-weight: 700;
+
+            color: #172033;
+
+        }
+
+        .order-date {
+
+            color: #64748b;
 
             font-size: 14px;
 
         }
 
+        /* ================= ORDER DETAILS ================= */
 
-        .orders-table td {
+        .order-details {
 
-            padding: 17px 16px;
+            display: grid;
 
-            border-bottom: 1px solid #edf2f7;
+            grid-template-columns:
+                repeat(auto-fit, minmax(180px, 1fr));
 
-            color: #475569;
-
-            font-size: 14px;
-
-        }
-
-
-        .orders-table tr:last-child td {
-
-            border-bottom: none;
+            gap: 20px;
 
         }
 
+        .detail-box {
 
-        .orders-table tr:hover {
+            background: #f8fafc;
 
-            background: #f8fbff;
+            padding: 17px;
+
+            border-radius: 10px;
 
         }
 
+        .detail-box span {
+
+            display: block;
+
+            color: #64748b;
+
+            font-size: 13px;
+
+            margin-bottom: 6px;
+
+        }
+
+        .detail-box strong {
+
+            color: #172033;
+
+            font-size: 16px;
+
+        }
+
+        .amount {
+
+            color: #2196F3 !important;
+
+            font-size: 20px !important;
+
+        }
 
         /* ================= STATUS ================= */
 
@@ -186,88 +340,88 @@
 
             display: inline-block;
 
-            padding: 6px 12px;
+            padding: 6px 13px;
 
             border-radius: 20px;
 
-            font-size: 12px;
+            font-size: 13px;
 
             font-weight: 600;
 
         }
 
-
         .pending {
 
-            background: #fff4df;
+            background: #fff3cd;
 
-            color: #d97706;
+            color: #856404;
 
         }
-
 
         .preparing {
 
-            background: #f1eaff;
+            background: #dbeafe;
 
-            color: #7c3aed;
+            color: #1d4ed8;
 
         }
 
-
         .delivered {
 
-            background: #eaf9ef;
+            background: #dcfce7;
+
+            color: #166534;
+
+        }
+
+        .cancelled {
+
+            background: #fee2e2;
+
+            color: #991b1b;
+
+        }
+
+        /* ================= PAYMENT ================= */
+
+        .paid {
 
             color: #15803d;
 
         }
 
+        .unpaid {
 
-        .cancelled {
-
-            background: #ffeded;
-
-            color: #dc2626;
+            color: #b45309;
 
         }
 
+        /* ================= EMPTY ORDERS ================= */
 
-        .payment {
-
-            background: #e8f3ff;
-
-            color: #1976D2;
-
-        }
-
-
-        /* ================= EMPTY ================= */
-
-        .empty-box {
+        .empty-orders {
 
             background: white;
 
-            text-align: center;
-
             padding: 60px 30px;
 
-            border-radius: 15px;
+            border-radius: 16px;
+
+            text-align: center;
 
             box-shadow:
-                0 5px 20px rgba(15,23,42,0.06);
+                0 5px 20px rgba(0,0,0,0.07);
 
         }
 
+        .empty-orders h2 {
 
-        .empty-box h2 {
+            color: #172033;
 
             margin-bottom: 10px;
 
         }
 
-
-        .empty-box p {
+        .empty-orders p {
 
             color: #64748b;
 
@@ -275,12 +429,11 @@
 
         }
 
-
-        .menu-btn {
+        .primary-btn {
 
             display: inline-block;
 
-            padding: 11px 22px;
+            padding: 12px 25px;
 
             background: #2196F3;
 
@@ -290,39 +443,142 @@
 
             border-radius: 7px;
 
-            font-weight: 600;
-
-            font-size: 14px;
+            font-weight: 500;
 
         }
 
-
-        .menu-btn:hover {
+        .primary-btn:hover {
 
             background: #1976D2;
 
         }
 
+        /* ================= FOOTER ================= */
 
-        /* ================= RESPONSIVE ================= */
+        footer {
 
-        @media(max-width:700px) {
+            background: #172033;
 
-            .order-header {
+            color: white;
 
-                padding: 35px 20px;
+            padding: 45px 8% 20px;
+
+        }
+
+        .footer-container {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fit, minmax(220px, 1fr));
+
+            gap: 35px;
+
+        }
+
+        .footer-box h3 {
+
+            margin-bottom: 15px;
+
+        }
+
+        .footer-box p {
+
+            color: #cbd5e1;
+
+            line-height: 1.7;
+
+        }
+
+        .footer-box a {
+
+            display: block;
+
+            color: #cbd5e1;
+
+            text-decoration: none;
+
+            margin: 8px 0;
+
+        }
+
+        .footer-box a:hover {
+
+            color: white;
+
+        }
+
+        .copyright {
+
+            text-align: center;
+
+            color: #94a3b8;
+
+            margin-top: 25px;
+
+        }
+
+        /* ================= MOBILE ================= */
+
+        @media(max-width: 768px) {
+
+            .navbar {
+
+                padding: 18px 20px;
+
+                flex-direction: column;
+
+                gap: 15px;
+
+            }
+
+            .nav-links {
+
+                flex-wrap: wrap;
+
+                justify-content: center;
+
+                gap: 15px;
+
+            }
+
+            .orders-hero {
+
+                flex-direction: column;
+
+                text-align: center;
+
+                padding: 40px 20px;
+
+            }
+
+            .hero-text h1 {
+
+                font-size: 32px;
+
+            }
+
+            .hero-image img {
+
+                width: 100%;
+
+                max-width: 330px;
 
             }
 
             .orders-section {
 
-                padding: 35px 20px;
+                padding: 40px 20px;
 
             }
 
-            .order-header h1 {
+            .order-top {
 
-                font-size: 28px;
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 8px;
 
             }
 
@@ -336,7 +592,9 @@
 <body>
 
 
-<!-- ================= NAVBAR ================= -->
+<!-- =====================================================
+     NAVBAR
+===================================================== -->
 
 <nav class="navbar">
 
@@ -346,74 +604,42 @@
 
     </div>
 
-
     <ul class="nav-links">
 
         <li>
-
             <a href="userHome.jsp">
-
                 Dashboard
-
             </a>
-
         </li>
 
-
         <li>
-
             <a href="MenuServlet">
-
                 Menu
-
             </a>
-
         </li>
 
-
         <li>
-
             <a href="CartServlet">
-
                 My Cart
-
             </a>
-
         </li>
 
-
         <li>
-
-            <a href="OrderHistoryServlet"
-               class="active">
-
+            <a href="OrderHistoryServlet">
                 My Orders
-
             </a>
-
         </li>
 
-
         <li>
-
             <a href="profile.jsp">
-
                 Profile
-
             </a>
-
         </li>
 
-
         <li>
-
-            <a href="LogoutServlet"
-               class="login-btn">
-
+            <a href="LogoutServlet">
                 Logout
-
             </a>
-
         </li>
 
     </ul>
@@ -421,221 +647,287 @@
 </nav>
 
 
-<!-- ================= HEADER ================= -->
+<!-- =====================================================
+     HERO
+===================================================== -->
 
-<section class="order-header">
+<section class="orders-hero">
 
-    <span class="tagline">
+    <div class="hero-text">
 
-        Order History
+        <span class="tagline">
 
-    </span>
+            FoodExpress Orders
+
+        </span>
+
+        <h1>
+
+            My Orders
+
+        </h1>
+
+        <p>
+
+            Hello
+            <strong><%=user.getFullName()%></strong>!
+            Here you can view your previous purchases
+            and track the status of your current orders.
+
+        </p>
+
+    </div>
 
 
-    <h1>
+    <div class="hero-image">
 
-        My Orders
+        <img
+            src="https://images.pexels.com/photos/3184192/pexels-photo-3184192.jpeg"
+            alt="Orders">
 
-    </h1>
-
-
-    <p>
-
-        View your previous orders and track their current status.
-
-    </p>
+    </div>
 
 </section>
 
 
-<!-- ================= ORDERS ================= -->
+<!-- =====================================================
+     ORDERS
+===================================================== -->
 
 <section class="orders-section">
 
-<%
+    <div class="section-title">
 
-    if (orderList != null && !orderList.isEmpty()) {
+        <h2>
 
-%>
+            Your Order History
 
-    <h2>
+        </h2>
 
-        Your Order History
+        <p>
 
-    </h2>
+            All your FoodExpress orders are shown below.
 
+        </p>
 
-    <div class="orders-table-wrapper">
-
-        <table class="orders-table">
-
-
-            <tr>
-
-                <th>Order ID</th>
-
-                <th>Total Amount</th>
-
-                <th>Order Status</th>
-
-                <th>Payment</th>
-
-                <th>Delivery Address</th>
-
-                <th>Order Date</th>
-
-            </tr>
+    </div>
 
 
 <%
+    if(orderList != null && !orderList.isEmpty()) {
 
-        for (Order order : orderList) {
+        for(Order order : orderList) {
 
             String status =
                     order.getOrderStatus();
 
-            String statusClass =
-                    "pending";
+            if(status == null) {
 
-            if ("Preparing".equalsIgnoreCase(status)) {
-
-                statusClass = "preparing";
-
-            } else if ("Delivered".equalsIgnoreCase(status)) {
-
-                statusClass = "delivered";
-
-            } else if ("Cancelled".equalsIgnoreCase(status)) {
-
-                statusClass = "cancelled";
+                status = "Pending";
 
             }
 
+            String statusClass =
+                    status.toLowerCase();
+
+            if(statusClass.equals("preparing")) {
+
+                statusClass = "preparing";
+
+            } else if(statusClass.equals("delivered")) {
+
+                statusClass = "delivered";
+
+            } else if(statusClass.equals("cancelled")) {
+
+                statusClass = "cancelled";
+
+            } else {
+
+                statusClass = "pending";
+
+            }
+
+
+            String paymentStatus =
+                    order.getPaymentStatus();
+
+            if(paymentStatus == null) {
+
+                paymentStatus = "Pending";
+
+            }
 %>
 
-            <tr>
+
+<!-- =====================================================
+     ORDER CARD
+===================================================== -->
+
+<div class="order-card">
+
+    <div class="order-top">
+
+        <div>
+
+            <div class="order-id">
+
+                Order #<%=order.getOrderId()%>
+
+            </div>
+
+        </div>
+
+        <div class="order-date">
+
+            <%=order.getOrderDate()%>
+
+        </div>
+
+    </div>
 
 
-                <td>
-
-                    <strong>
-
-                        #<%=order.getOrderId()%>
-
-                    </strong>
-
-                </td>
+    <div class="order-details">
 
 
-                <td>
+        <!-- TOTAL -->
 
-                    <strong>
+        <div class="detail-box">
 
-                        ৳<%=String.format(
-                                "%.2f",
-                                order.getTotalAmount()
-                        )%>
+            <span>
 
-                    </strong>
+                Total Amount
 
-                </td>
+            </span>
 
+            <strong class="amount">
 
-                <td>
+                ৳<%=String.format(
+                    "%.2f",
+                    order.getTotalAmount()
+                )%>
 
-                    <span class="status <%=statusClass%>">
+            </strong>
 
-                        <%=order.getOrderStatus()%>
-
-                    </span>
-
-                </td>
+        </div>
 
 
-                <td>
+        <!-- ORDER STATUS -->
 
-                    <span class="status payment">
+        <div class="detail-box">
 
-                        <%=order.getPaymentStatus()%>
+            <span>
 
-                    </span>
+                Order Status
 
-                </td>
+            </span>
 
+            <strong>
 
-                <td>
+                <span class="status <%=statusClass%>">
 
-                    <%=order.getDeliveryAddress()%>
+                    <%=status%>
 
-                </td>
+                </span>
 
+            </strong>
 
-                <td>
-
-                    <%=order.getOrderDate()%>
-
-                </td>
+        </div>
 
 
-            </tr>
+        <!-- PAYMENT -->
+
+        <div class="detail-box">
+
+            <span>
+
+                Payment Status
+
+            </span>
+
+            <strong class="<%=paymentStatus.equals("Paid")
+                    ? "paid"
+                    : "unpaid"%>">
+
+                <%=paymentStatus%>
+
+            </strong>
+
+        </div>
+
+
+        <!-- ADDRESS -->
+
+        <div class="detail-box">
+
+            <span>
+
+                Delivery Address
+
+            </span>
+
+            <strong>
+
+                <%=order.getDeliveryAddress() == null
+                        ? "Not Available"
+                        : order.getDeliveryAddress()%>
+
+            </strong>
+
+        </div>
+
+
+    </div>
+
+</div>
+
 
 <%
-
         }
 
-%>
-
-        </table>
-
-    </div>
-
-
-<%
-
     } else {
-
 %>
 
 
-    <div class="empty-box">
+<!-- =====================================================
+     EMPTY ORDERS
+===================================================== -->
 
+<div class="empty-orders">
 
-        <h2>
+    <h2>
 
-            No Orders Yet
+        No Orders Yet
 
-        </h2>
+    </h2>
 
+    <p>
 
-        <p>
+        You haven't placed any orders yet.
+        Explore our menu and order your favorite food!
 
-            You haven't placed any orders yet.
-            Explore our menu and order your favorite food.
+    </p>
 
-        </p>
+    <a href="MenuServlet"
+       class="primary-btn">
 
+        Explore Menu
 
-        <a href="MenuServlet"
-           class="menu-btn">
+    </a>
 
-            Explore Menu
-
-        </a>
-
-
-    </div>
+</div>
 
 
 <%
-
     }
-
 %>
 
 </section>
 
 
-<!-- ================= FOOTER ================= -->
+<!-- =====================================================
+     FOOTER
+===================================================== -->
 
 <footer>
 
@@ -650,11 +942,10 @@
 
             </h3>
 
-
             <p>
 
-                Delicious food, fast delivery and a premium
-                online food ordering experience.
+                Delicious food, fast delivery and
+                a premium online food ordering experience.
 
             </p>
 
@@ -669,32 +960,24 @@
 
             </h3>
 
-
             <a href="userHome.jsp">
-
                 Dashboard
-
             </a>
-
 
             <a href="MenuServlet">
-
                 Menu
-
             </a>
-
 
             <a href="CartServlet">
-
                 My Cart
-
             </a>
 
-
             <a href="OrderHistoryServlet">
-
                 My Orders
+            </a>
 
+            <a href="profile.jsp">
+                Profile
             </a>
 
         </div>
@@ -708,20 +991,17 @@
 
             </h3>
 
-
             <p>
 
                 Email : info@foodexpress.com
 
             </p>
 
-
             <p>
 
                 Phone : +880 1700-123456
 
             </p>
-
 
             <p>
 

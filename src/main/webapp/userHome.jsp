@@ -4,7 +4,7 @@
 <%
     User user = (User) session.getAttribute("user");
 
-    if(user == null){
+    if (user == null) {
         response.sendRedirect("login.jsp");
         return;
     }
@@ -20,7 +20,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>User Dashboard | FoodExpress</title>
+    <title>Dashboard | FoodExpress</title>
 
     <link rel="stylesheet"
           href="css/style.css">
@@ -28,9 +28,306 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
           rel="stylesheet">
 
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: #f5f8fc;
+            color: #1e293b;
+        }
+
+        /* ================= NAVBAR ================= */
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 55px;
+            background: #2196F3;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.12);
+        }
+
+        .logo {
+            color: white;
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.15);
+            padding: 9px 17px;
+            border-radius: 7px;
+        }
+
+        /* ================= HERO ================= */
+
+        .hero {
+            margin: 35px 55px;
+            min-height: 300px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 45px;
+
+            border-radius: 22px;
+
+            background: linear-gradient(
+                135deg,
+                #2196F3,
+                #64B5F6
+            );
+
+            color: white;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 10px 30px rgba(33,150,243,0.25);
+        }
+
+        .hero-content {
+            max-width: 600px;
+        }
+
+        .hero-content h1 {
+            font-size: 38px;
+            margin: 10px 0;
+        }
+
+        .hero-content p {
+            font-size: 16px;
+            line-height: 1.7;
+            opacity: 0.95;
+        }
+
+        .hero-image img {
+            width: 330px;
+            height: 230px;
+            object-fit: cover;
+            border-radius: 18px;
+        }
+
+        /* ================= BUTTON ================= */
+
+        .hero-btn {
+            display: inline-block;
+            margin-top: 18px;
+            padding: 12px 25px;
+
+            background: white;
+            color: #1976D2;
+
+            text-decoration: none;
+
+            border-radius: 8px;
+
+            font-weight: 600;
+
+            transition: 0.3s;
+        }
+
+        .hero-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+
+        /* ================= SECTION ================= */
+
+        .dashboard {
+            padding: 10px 55px 50px;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .section-title h2 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .section-title p {
+            color: #64748b;
+        }
+
+        /* ================= CARDS ================= */
+
+        .card-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fit, minmax(250px, 1fr));
+
+            gap: 25px;
+        }
+
+        .dashboard-card {
+            background: white;
+
+            padding: 30px;
+
+            border-radius: 15px;
+
+            text-align: center;
+
+            box-shadow:
+                0 5px 20px rgba(0,0,0,0.07);
+
+            transition: 0.3s;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-6px);
+
+            box-shadow:
+                0 10px 28px rgba(0,0,0,0.12);
+        }
+
+        .card-icon {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-card h3 {
+            margin: 10px 0;
+        }
+
+        .dashboard-card p {
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        .card-btn {
+            display: inline-block;
+
+            margin-top: 15px;
+
+            padding: 10px 20px;
+
+            background: #2196F3;
+            color: white;
+
+            text-decoration: none;
+
+            border-radius: 7px;
+
+            font-weight: 500;
+        }
+
+        .card-btn:hover {
+            background: #1976D2;
+        }
+
+        /* ================= OFFER CARD ================= */
+
+        .offer-card {
+            background:
+                linear-gradient(
+                    135deg,
+                    #ffffff,
+                    #eef7ff
+                );
+
+            border: 1px solid #dbeafe;
+
+            position: relative;
+        }
+
+        .offer-badge {
+            display: inline-block;
+
+            background: #2196F3;
+
+            color: white;
+
+            padding: 5px 12px;
+
+            border-radius: 20px;
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+            margin-bottom: 10px;
+        }
+
+        /* ================= FOOTER ================= */
+
+        footer {
+            margin-top: 30px;
+            padding: 35px 55px;
+            background: #172033;
+            color: white;
+            text-align: center;
+        }
+
+        footer p {
+            color: #cbd5e1;
+            margin: 5px;
+        }
+
+        @media(max-width: 800px) {
+
+            .navbar {
+                padding: 15px 20px;
+            }
+
+            .nav-links {
+                gap: 10px;
+                font-size: 13px;
+            }
+
+            .hero {
+                margin: 20px;
+                padding: 30px;
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .hero-image img {
+                width: 100%;
+                margin-top: 25px;
+            }
+
+            .dashboard {
+                padding: 20px;
+            }
+
+        }
+
+    </style>
+
 </head>
 
 <body>
+
 
 <!-- ================= NAVBAR ================= -->
 
@@ -43,8 +340,8 @@
     <ul class="nav-links">
 
         <li>
-            <a href="userHome.jsp" class="active">
-                Dashboard
+            <a href="userHome.jsp">
+                Home
             </a>
         </li>
 
@@ -55,13 +352,13 @@
         </li>
 
         <li>
-            <a href="cart.jsp">
+            <a href="CartServlet">
                 My Cart
             </a>
         </li>
 
         <li>
-            <a href="orderHistory.jsp">
+            <a href="OrderHistoryServlet">
                 My Orders
             </a>
         </li>
@@ -74,7 +371,7 @@
 
         <li>
             <a href="LogoutServlet"
-               class="login-btn">
+               class="logout-btn">
                 Logout
             </a>
         </li>
@@ -83,38 +380,117 @@
 
 </nav>
 
+
 <!-- ================= HERO ================= -->
 
-<section class="dashboard-hero">
+<section class="hero">
 
-    <div class="dashboard-left">
+    <div class="hero-content">
 
-        <span class="tagline">
-            Welcome Back 👋
-        </span>
+        <p>
+            Welcome back,
+            <strong><%=user.getFullName()%></strong>
+        </p>
 
         <h1>
-            Hello,
-            <%= user.getFullName() %>
+            Delicious Food,
+            Just One Click Away!
         </h1>
 
         <p>
-            Manage your orders, explore delicious meals,
-            check your cart and enjoy exclusive FoodExpress
-            member offers.
+            Explore our delicious menu, order your
+            favorite meals and enjoy a premium
+            FoodExpress experience.
         </p>
 
-        <div class="hero-buttons">
+        <a href="MenuServlet"
+           class="hero-btn">
+
+            Explore Menu
+
+        </a>
+
+    </div>
+
+
+    <div class="hero-image">
+
+        <img
+            src="https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg"
+            alt="Food">
+
+    </div>
+
+</section>
+
+
+<!-- ================= DASHBOARD ================= -->
+
+<section class="dashboard">
+
+    <div class="section-title">
+
+        <h2>
+            What would you like to do?
+        </h2>
+
+        <p>
+            Manage your FoodExpress experience
+            from here.
+        </p>
+
+    </div>
+
+
+    <div class="card-grid">
+
+
+        <!-- MENU -->
+
+        <div class="dashboard-card">
+
+            <div class="card-icon">
+                🍔
+            </div>
+
+            <h3>
+                Explore Menu
+            </h3>
+
+            <p>
+                Browse delicious meals and
+                choose your favorite food.
+            </p>
 
             <a href="MenuServlet"
-               class="primary-btn">
+               class="card-btn">
 
-                Order Food
+                Explore Menu
 
             </a>
 
-            <a href="cart.jsp"
-               class="secondary-btn">
+        </div>
+
+
+        <!-- CART -->
+
+        <div class="dashboard-card">
+
+            <div class="card-icon">
+                🛒
+            </div>
+
+            <h3>
+                My Cart
+            </h3>
+
+            <p>
+                View your selected food items
+                and proceed to checkout.
+            </p>
+
+            <a href="CartServlet"
+               class="card-btn">
 
                 View Cart
 
@@ -122,122 +498,26 @@
 
         </div>
 
-    </div>
 
-    <div class="dashboard-right">
-
-        <img src="https://images.pexels.com/photos/67468/pexels-photo-67468.jpeg"
-             alt="Food">
-
-    </div>
-
-</section>
-        <!-- ================= ACCOUNT OVERVIEW ================= -->
-
-<section class="dashboard">
-
-    <h2>Account Overview</h2>
-
-    <p>Your FoodExpress account summary.</p>
-
-    <div class="dashboard-container">
+        <!-- ORDERS -->
 
         <div class="dashboard-card">
 
-            <h3>Total Orders</h3>
+            <div class="card-icon">
+                📦
+            </div>
 
-            <h1>12</h1>
-
-            <p>Orders placed so far.</p>
-
-        </div>
-
-        <div class="dashboard-card">
-
-            <h3>Cart Items</h3>
-
-            <h1>3</h1>
-
-            <p>Ready for checkout.</p>
-
-        </div>
-
-        <div class="dashboard-card">
-
-            <h3>Reward Points</h3>
-
-            <h1>220</h1>
-
-            <p>Earn more with every order.</p>
-
-        </div>
-
-        <div class="dashboard-card">
-
-            <h3>Membership</h3>
-
-            <h1>Gold</h1>
-
-            <p>Premium customer benefits.</p>
-
-        </div>
-
-    </div>
-
-</section>
-
-<!-- ================= QUICK ACTIONS ================= -->
-
-<section class="dashboard">
-
-    <h2>Quick Actions</h2>
-
-    <div class="dashboard-container">
-
-        <div class="dashboard-card">
-
-            <h3>🍽 Browse Menu</h3>
+            <h3>
+                My Orders
+            </h3>
 
             <p>
-                Explore our delicious food collection.
+                Track your previous orders and
+                check their current status.
             </p>
 
-            <a href="MenuServlet"
-               class="primary-btn">
-
-                Open Menu
-
-            </a>
-
-        </div>
-
-        <div class="dashboard-card">
-
-            <h3>🛒 My Cart</h3>
-
-            <p>
-                Review your selected food items before checkout.
-            </p>
-
-            <a href="cart.jsp"
-               class="primary-btn">
-
-                View Cart
-
-            </a>
-
-        </div>
-
-        <div class="dashboard-card">
-
-            <h3>📦 My Orders</h3>
-
-            <p>
-                Track current orders and previous purchases.
-            </p>
-
-            <a href="orderHistory.jsp"
-               class="primary-btn">
+            <a href="OrderHistoryServlet"
+               class="card-btn">
 
                 View Orders
 
@@ -245,274 +525,63 @@
 
         </div>
 
-        <div class="dashboard-card">
 
-            <h3>👤 My Profile</h3>
+        <!-- CLAIM OFFER -->
+
+        <div class="dashboard-card offer-card">
+
+            <span class="offer-badge">
+                SPECIAL OFFER
+            </span>
+
+            <div class="card-icon">
+                🎁
+            </div>
+
+            <h3>
+                Claim Offers
+            </h3>
 
             <p>
-                Update your personal information.
+                Get exclusive FoodExpress
+                discounts and special rewards.
             </p>
 
-            <a href="profile.jsp"
-               class="primary-btn">
+            <a href="offers.jsp"
+               class="card-btn">
 
-                Edit Profile
+                Claim Offer
 
             </a>
 
         </div>
 
-    </div>
-
-</section>
-
-<!-- ================= RECOMMENDED FOOD ================= -->
-
-<section class="featured">
-
-    <h2>Recommended For You</h2>
-
-    <p>Popular dishes loved by our customers.</p>
-
-    <div class="food-container">
-
-        <div class="food-card">
-
-            <img src="https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg"
-                 alt="Burger">
-
-            <div class="food-info">
-
-                <h3>Classic Beef Burger</h3>
-
-                <span class="price">৳450</span>
-
-                <p>
-                    Juicy grilled beef burger with crispy fries.
-                </p>
-
-                <a href="MenuServlet"
-                   class="primary-btn">
-
-                    Order Now
-
-                </a>
-
-            </div>
-
-        </div>
-
-        <div class="food-card">
-
-            <img src="https://images.pexels.com/photos/825661/pexels-photo-825661.jpeg"
-                 alt="Pizza">
-
-            <div class="food-info">
-
-                <h3>Italian Pizza</h3>
-
-                <span class="price">৳850</span>
-
-                <p>
-                    Loaded with mozzarella cheese and fresh toppings.
-                </p>
-
-                <a href="MenuServlet"
-                   class="primary-btn">
-
-                    Order Now
-
-                </a>
-
-            </div>
-
-        </div>
-
-        <div class="food-card">
-
-            <img src="https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg"
-                 alt="Pasta">
-
-            <div class="food-info">
-
-                <h3>Chicken Alfredo Pasta</h3>
-
-                <span class="price">৳780</span>
-
-                <p>
-                    Creamy Alfredo pasta served with grilled chicken.
-                </p>
-
-                <a href="MenuServlet"
-                   class="primary-btn">
-
-                    Order Now
-
-                </a>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-<!-- ================= TODAY'S OFFER ================= -->
-
-<section class="offers">
-
-    <div class="offer-box">
-
-        <h2>
-            🎉 Exclusive Member Offer
-        </h2>
-
-        <p>
-            Congratulations! As a logged-in customer,
-            you get an extra <strong>20% OFF</strong>
-            on orders above <strong>৳1500</strong>.
-        </p>
-
-        <a href="MenuServlet"
-           class="primary-btn">
-
-            Order Now
-
-        </a>
 
     </div>
 
 </section>
 
-<!-- ================= RECENT ORDERS ================= -->
-
-<section class="dashboard">
-
-    <h2>Recent Orders</h2>
-
-    <table class="order-table">
-
-        <tr>
-
-            <th>Order ID</th>
-            <th>Food Item</th>
-            <th>Price</th>
-            <th>Status</th>
-
-        </tr>
-
-        <tr>
-
-            <td>#1001</td>
-            <td>Chicken Alfredo Pasta</td>
-            <td>৳780</td>
-            <td><span class="status preparing">Preparing</span></td>
-
-        </tr>
-
-        <tr>
-
-            <td>#1002</td>
-            <td>Classic Beef Burger</td>
-            <td>৳450</td>
-            <td><span class="status delivered">Delivered</span></td>
-
-        </tr>
-
-        <tr>
-
-            <td>#1003</td>
-            <td>Italian Pizza</td>
-            <td>৳850</td>
-            <td><span class="status pending">Pending</span></td>
-
-        </tr>
-
-    </table>
-
-</section>
-
-<!-- ================= NEWSLETTER ================= -->
-
-<section class="newsletter">
-
-    <div class="newsletter-content">
-
-        <h2>Stay Updated</h2>
-
-        <p>
-            Subscribe to receive exclusive offers,
-            new menu updates and special discounts.
-        </p>
-
-        <form>
-
-            <input type="email"
-                   placeholder="Enter your email">
-
-            <button type="submit">
-
-                Subscribe
-
-            </button>
-
-        </form>
-
-    </div>
-
-</section>
 
 <!-- ================= FOOTER ================= -->
 
 <footer>
 
-    <div class="footer-container">
+    <h3>
+        FoodExpress
+    </h3>
 
-        <div class="footer-box">
+    <p>
+        Delicious food, fast delivery and
+        a premium online ordering experience.
+    </p>
 
-            <h3>FoodExpress</h3>
-
-            <p>
-                Premium Online Food Ordering System
-                delivering fresh meals quickly and safely.
-            </p>
-
-        </div>
-
-        <div class="footer-box">
-
-            <h3>Quick Links</h3>
-
-            <a href="userHome.jsp">Dashboard</a>
-            <a href="MenuServlet">Menu</a>
-            <a href="cart.jsp">My Cart</a>
-            <a href="orderHistory.jsp">My Orders</a>
-            <a href="profile.jsp">Profile</a>
-            <a href="LogoutServlet">Logout</a>
-
-        </div>
-
-        <div class="footer-box">
-
-            <h3>Contact</h3>
-
-            <p>Email : info@foodexpress.com</p>
-            <p>Phone : +880 1700-123456</p>
-            <p>Sylhet, Bangladesh</p>
-
-        </div>
-
-    </div>
-
-    <hr>
-
-    <p class="copyright">
-
+    <p>
         © 2026 FoodExpress. All Rights Reserved.
-
     </p>
 
 </footer>
 
+
 </body>
+
 </html>

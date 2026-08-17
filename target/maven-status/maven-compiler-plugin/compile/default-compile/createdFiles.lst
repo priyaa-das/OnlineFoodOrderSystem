@@ -1,3 +1,4 @@
+com\foodexpress\dao\AdminProfileDAO.class
 com\foodexpress\dao\CartDAO.class
 com\foodexpress\servlet\DeleteFoodServlet.class
 com\foodexpress\servlet\RemoveFromCartServlet.class
@@ -6,6 +7,7 @@ com\foodexpress\servlet\AdminLoginServlet.class
 com\foodexpress\servlet\ViewUsersServlet.class
 com\foodexpress\dao\FoodDAO.class
 com\foodexpress\servlet\PlaceOrderServlet.class
+com\foodexpress\servlet\UpdateAdminProfileServlet.class
 com\foodexpress\model\Cart.class
 com\foodexpress\servlet\MenuServlet.class
 com\foodexpress\dao\UserDAO.class
@@ -30,4 +32,5 @@ com\foodexpress\servlet\SalesReportServlet.class
 com\foodexpress\servlet\AddToCartServlet.class
 com\foodexpress\servlet\AdminOrderServlet.class
 com\foodexpress\model\OrderItem.class
+com\foodexpress\servlet\ClaimOfferServlet.class
 com\foodexpress\servlet\RegisterServlet.class
