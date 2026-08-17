@@ -6,185 +6,327 @@ import com.foodexpress.model.Cart;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class CartDAO {
 
-    Connection con;
-    PreparedStatement pst;
-    ResultSet rs;
-
     // =====================================================
-    // ADD FOOD TO CART
+    // ADD TO CART
     // =====================================================
 
-    public boolean addToCart(int userId, int foodId, int quantity) {
+    public boolean addToCart(
+            int userId,
+            int foodId,
+            int quantity) {
 
-        boolean status = false;
+
+        Connection con = null;
+        PreparedStatement pst = null;
+        ResultSet rs = null;
+
 
         try {
 
-            con = DBConnection.getConnection();
+            con =
+                    DBConnection.getConnection();
 
+
+            // Check whether food already exists
             String checkSql =
-                    "SELECT cart_id, quantity " +
-                    "FROM cart " +
-                    "WHERE user_id=? AND food_id=?";
+                    "SELECT cart_id, quantity "
+                    + "FROM cart "
+                    + "WHERE user_id=? "
+                    + "AND food_id=?";
 
-            pst = con.prepareStatement(checkSql);
+
+            pst =
+                    con.prepareStatement(
+                            checkSql
+                    );
+
 
             pst.setInt(1, userId);
             pst.setInt(2, foodId);
 
-            rs = pst.executeQuery();
+
+            rs =
+                    pst.executeQuery();
+
+
+            // =================================================
+            // FOOD ALREADY IN CART
+            // =================================================
 
             if (rs.next()) {
 
-                int cartId = rs.getInt("cart_id");
-                int oldQuantity = rs.getInt("quantity");
 
-                int newQuantity = oldQuantity + quantity;
+                int cartId =
+                        rs.getInt("cart_id");
+
+
+                int oldQuantity =
+                        rs.getInt("quantity");
+
+
+                int newQuantity =
+                        oldQuantity + quantity;
+
 
                 rs.close();
                 rs = null;
 
+
                 pst.close();
                 pst = null;
+
 
                 String updateSql =
-                        "UPDATE cart " +
-                        "SET quantity=? " +
-                        "WHERE cart_id=? AND user_id=?";
+                        "UPDATE cart "
+                        + "SET quantity=? "
+                        + "WHERE cart_id=? "
+                        + "AND user_id=?";
 
-                pst = con.prepareStatement(updateSql);
 
-                pst.setInt(1, newQuantity);
-                pst.setInt(2, cartId);
-                pst.setInt(3, userId);
+                pst =
+                        con.prepareStatement(
+                                updateSql
+                        );
 
-                int row = pst.executeUpdate();
 
-                if (row > 0) {
-                    status = true;
-                }
+                pst.setInt(
+                        1,
+                        newQuantity
+                );
 
-            } else {
+                pst.setInt(
+                        2,
+                        cartId
+                );
 
-                rs.close();
-                rs = null;
+                pst.setInt(
+                        3,
+                        userId
+                );
 
-                pst.close();
-                pst = null;
 
-                String insertSql =
-                        "INSERT INTO cart " +
-                        "(user_id, food_id, quantity) " +
-                        "VALUES (?, ?, ?)";
+                int row =
+                        pst.executeUpdate();
 
-                pst = con.prepareStatement(insertSql);
 
-                pst.setInt(1, userId);
-                pst.setInt(2, foodId);
-                pst.setInt(3, quantity);
-
-                int row = pst.executeUpdate();
-
-                if (row > 0) {
-                    status = true;
-                }
+                return row > 0;
             }
+
+
+            // =================================================
+            // NEW FOOD
+            // =================================================
+
+            rs.close();
+            rs = null;
+
+
+            pst.close();
+            pst = null;
+
+
+            String insertSql =
+                    "INSERT INTO cart "
+                    + "(user_id, food_id, quantity) "
+                    + "VALUES (?, ?, ?)";
+
+
+            pst =
+                    con.prepareStatement(
+                            insertSql
+                    );
+
+
+            pst.setInt(
+                    1,
+                    userId
+            );
+
+            pst.setInt(
+                    2,
+                    foodId
+            );
+
+            pst.setInt(
+                    3,
+                    quantity
+            );
+
+
+            int row =
+                    pst.executeUpdate();
+
+
+            return row > 0;
+
 
         } catch (Exception e) {
 
-            System.out.println("ADD TO CART ERROR");
+
+            System.out.println(
+                    "ADD TO CART ERROR"
+            );
+
             e.printStackTrace();
+
+
+            return false;
+
 
         } finally {
 
-            closeResources();
+            close(
+                    rs,
+                    pst,
+                    con
+            );
         }
-
-        return status;
     }
 
 
     // =====================================================
-    // GET CUSTOMER CART
+    // GET CART BY USER
     // =====================================================
 
-    public List<Cart> getCartByUserId(int userId) {
+    public List<Cart> getCartByUserId(
+            int userId) {
 
-        List<Cart> cartList = new ArrayList<>();
+
+        List<Cart> cartList =
+                new ArrayList<>();
+
+
+        Connection con = null;
+        PreparedStatement pst = null;
+        ResultSet rs = null;
+
 
         try {
 
-            con = DBConnection.getConnection();
+
+            con =
+                    DBConnection.getConnection();
+
 
             String sql =
-                    "SELECT c.cart_id, " +
-                    "c.user_id, " +
-                    "c.food_id, " +
-                    "f.food_name, " +
-                    "f.price, " +
-                    "f.image_url, " +
-                    "c.quantity " +
-                    "FROM cart c " +
-                    "JOIN food_items f " +
-                    "ON c.food_id = f.food_id " +
-                    "WHERE c.user_id=? " +
-                    "ORDER BY c.cart_id DESC";
+                    "SELECT "
+                    + "c.cart_id, "
+                    + "c.user_id, "
+                    + "c.food_id, "
+                    + "c.quantity, "
+                    + "f.food_name, "
+                    + "f.price, "
+                    + "f.image_url "
+                    + "FROM cart c "
+                    + "JOIN food_items f "
+                    + "ON c.food_id=f.food_id "
+                    + "WHERE c.user_id=? "
+                    + "ORDER BY c.cart_id DESC";
 
-            pst = con.prepareStatement(sql);
 
-            pst.setInt(1, userId);
+            pst =
+                    con.prepareStatement(
+                            sql
+                    );
 
-            rs = pst.executeQuery();
+
+            pst.setInt(
+                    1,
+                    userId
+            );
+
+
+            rs =
+                    pst.executeQuery();
+
 
             while (rs.next()) {
 
-                Cart cart = new Cart();
+
+                Cart cart =
+                        new Cart();
+
 
                 cart.setCartId(
-                        rs.getInt("cart_id")
+                        rs.getInt(
+                                "cart_id"
+                        )
                 );
+
 
                 cart.setUserId(
-                        rs.getInt("user_id")
+                        rs.getInt(
+                                "user_id"
+                        )
                 );
+
 
                 cart.setFoodId(
-                        rs.getInt("food_id")
+                        rs.getInt(
+                                "food_id"
+                        )
                 );
+
 
                 cart.setFoodName(
-                        rs.getString("food_name")
+                        rs.getString(
+                                "food_name"
+                        )
                 );
+
 
                 cart.setPrice(
-                        rs.getDouble("price")
+                        rs.getDouble(
+                                "price"
+                        )
                 );
+
 
                 cart.setImageUrl(
-                        rs.getString("image_url")
+                        rs.getString(
+                                "image_url"
+                        )
                 );
+
 
                 cart.setQuantity(
-                        rs.getInt("quantity")
+                        rs.getInt(
+                                "quantity"
+                        )
                 );
 
-                cartList.add(cart);
+
+                cartList.add(
+                        cart
+                );
             }
+
 
         } catch (Exception e) {
 
-            System.out.println("GET CART ERROR");
+
+            System.out.println(
+                    "GET CART ERROR"
+            );
+
             e.printStackTrace();
+
 
         } finally {
 
-            closeResources();
+            close(
+                    rs,
+                    pst,
+                    con
+            );
         }
+
 
         return cartList;
     }
@@ -193,71 +335,92 @@ public class CartDAO {
     // =====================================================
     // GET CART ITEMS
     // =====================================================
-    // This method is used by CheckoutServlet
-    // and PlaceOrderServlet.
-    // =====================================================
 
-    public List<Cart> getCartItems(int userId) {
+    public List<Cart> getCartItems(
+            int userId) {
 
-        return getCartByUserId(userId);
+        return getCartByUserId(
+                userId
+        );
     }
 
 
     // =====================================================
-    // REMOVE ONE FOOD FROM CART
+    // REMOVE
     // =====================================================
 
-    public boolean removeFromCart(int cartId, int userId) {
+    public boolean removeFromCart(
+            int cartId,
+            int userId) {
 
-        boolean status = false;
+
+        Connection con = null;
+        PreparedStatement pst = null;
+
 
         try {
 
-            con = DBConnection.getConnection();
+
+            con =
+                    DBConnection.getConnection();
+
 
             String sql =
-                    "DELETE FROM cart " +
-                    "WHERE cart_id=? " +
-                    "AND user_id=?";
+                    "DELETE FROM cart "
+                    + "WHERE cart_id=? "
+                    + "AND user_id=?";
 
-            pst = con.prepareStatement(sql);
 
-            pst.setInt(1, cartId);
-            pst.setInt(2, userId);
+            pst =
+                    con.prepareStatement(
+                            sql
+                    );
 
-            int row = pst.executeUpdate();
 
-            if (row > 0) {
+            pst.setInt(
+                    1,
+                    cartId
+            );
 
-                System.out.println(
-                        "Cart Item Removed Successfully"
-                );
+            pst.setInt(
+                    2,
+                    userId
+            );
 
-                status = true;
 
-            } else {
+            int row =
+                    pst.executeUpdate();
 
-                System.out.println(
-                        "Cart Item Not Found"
-                );
-            }
+
+            return row > 0;
+
 
         } catch (Exception e) {
 
-            System.out.println("REMOVE CART ERROR");
+
+            System.out.println(
+                    "REMOVE CART ERROR"
+            );
+
             e.printStackTrace();
+
+
+            return false;
+
 
         } finally {
 
-            closeResources();
+            close(
+                    null,
+                    pst,
+                    con
+            );
         }
-
-        return status;
     }
 
 
     // =====================================================
-    // UPDATE CART QUANTITY
+    // UPDATE QUANTITY
     // =====================================================
 
     public boolean updateQuantity(
@@ -265,79 +428,147 @@ public class CartDAO {
             int userId,
             int quantity) {
 
-        boolean status = false;
+
+        Connection con = null;
+        PreparedStatement pst = null;
+
 
         try {
 
-            con = DBConnection.getConnection();
+
+            if (quantity < 1) {
+
+                quantity = 1;
+            }
+
+
+            con =
+                    DBConnection.getConnection();
+
 
             String sql =
-                    "UPDATE cart " +
-                    "SET quantity=? " +
-                    "WHERE cart_id=? " +
-                    "AND user_id=?";
+                    "UPDATE cart "
+                    + "SET quantity=? "
+                    + "WHERE cart_id=? "
+                    + "AND user_id=?";
 
-            pst = con.prepareStatement(sql);
 
-            pst.setInt(1, quantity);
-            pst.setInt(2, cartId);
-            pst.setInt(3, userId);
+            pst =
+                    con.prepareStatement(
+                            sql
+                    );
 
-            int row = pst.executeUpdate();
 
-            if (row > 0) {
-                status = true;
-            }
+            pst.setInt(
+                    1,
+                    quantity
+            );
+
+            pst.setInt(
+                    2,
+                    cartId
+            );
+
+            pst.setInt(
+                    3,
+                    userId
+            );
+
+
+            int row =
+                    pst.executeUpdate();
+
+
+            return row > 0;
+
 
         } catch (Exception e) {
 
-            System.out.println("UPDATE CART ERROR");
+
+            System.out.println(
+                    "UPDATE QUANTITY ERROR"
+            );
+
             e.printStackTrace();
+
+
+            return false;
+
 
         } finally {
 
-            closeResources();
+            close(
+                    null,
+                    pst,
+                    con
+            );
         }
-
-        return status;
     }
 
 
     // =====================================================
-    // CLEAR CUSTOMER CART
+    // CLEAR CART
     // =====================================================
 
-    public boolean clearCart(int userId) {
+    public boolean clearCart(
+            int userId) {
 
-        boolean status = false;
+
+        Connection con = null;
+        PreparedStatement pst = null;
+
 
         try {
 
-            con = DBConnection.getConnection();
+
+            con =
+                    DBConnection.getConnection();
+
 
             String sql =
-                    "DELETE FROM cart " +
-                    "WHERE user_id=?";
+                    "DELETE FROM cart "
+                    + "WHERE user_id=?";
 
-            pst = con.prepareStatement(sql);
 
-            pst.setInt(1, userId);
+            pst =
+                    con.prepareStatement(
+                            sql
+                    );
+
+
+            pst.setInt(
+                    1,
+                    userId
+            );
+
 
             pst.executeUpdate();
 
-            status = true;
+
+            return true;
+
 
         } catch (Exception e) {
 
-            System.out.println("CLEAR CART ERROR");
+
+            System.out.println(
+                    "CLEAR CART ERROR"
+            );
+
             e.printStackTrace();
+
+
+            return false;
+
 
         } finally {
 
-            closeResources();
+            close(
+                    null,
+                    pst,
+                    con
+            );
         }
-
-        return status;
     }
 
 
@@ -345,28 +576,39 @@ public class CartDAO {
     // CLOSE RESOURCES
     // =====================================================
 
-    private void closeResources() {
+    private void close(
+            ResultSet rs,
+            PreparedStatement pst,
+            Connection con) {
+
 
         try {
 
             if (rs != null) {
                 rs.close();
-                rs = null;
-            }
-
-            if (pst != null) {
-                pst.close();
-                pst = null;
-            }
-
-            if (con != null) {
-                con.close();
-                con = null;
             }
 
         } catch (Exception e) {
+        }
 
-            e.printStackTrace();
+
+        try {
+
+            if (pst != null) {
+                pst.close();
+            }
+
+        } catch (Exception e) {
+        }
+
+
+        try {
+
+            if (con != null) {
+                con.close();
+            }
+
+        } catch (Exception e) {
         }
     }
 }

@@ -45,6 +45,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
           rel="stylesheet">
 
+
     <style>
 
         * {
@@ -57,6 +58,7 @@
             background: #f5f8fc;
             color: #1e293b;
         }
+
 
         /* ================= NAVBAR ================= */
 
@@ -106,6 +108,7 @@
             border-radius: 6px;
         }
 
+
         /* ================= HERO ================= */
 
         .cart-hero {
@@ -114,6 +117,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 45px 70px;
+
             background: linear-gradient(
                 135deg,
                 #e3f2fd,
@@ -152,6 +156,7 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
 
+
         /* ================= MAIN ================= */
 
         .cart-section {
@@ -169,6 +174,7 @@
             gap: 30px;
             align-items: start;
         }
+
 
         /* ================= TABLE ================= */
 
@@ -215,17 +221,144 @@
             font-weight: 500;
         }
 
-        .quantity {
-            background: #eff6ff;
-            padding: 7px 13px;
-            border-radius: 7px;
-            font-weight: 600;
-        }
-
         .item-total {
             color: #2196F3;
             font-weight: 700;
         }
+
+
+        /* ================================================= */
+        /* FOODPANDA STYLE QUANTITY SECTION                  */
+        /* ================================================= */
+
+        .food-action {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 7px;
+        }
+
+
+        /* Quantity outer box */
+
+        .quantity-box {
+            display: inline-flex;
+            align-items: center;
+
+            height: 38px;
+
+            border: 1px solid #d9d9d9;
+            border-radius: 20px;
+
+            background: #ffffff;
+
+            overflow: hidden;
+
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+
+        /* Forms inside quantity */
+
+        .quantity-box form {
+            margin: 0;
+            padding: 0;
+        }
+
+
+        /* Plus and Minus buttons */
+
+        .qty-minus,
+        .qty-plus {
+
+            width: 38px;
+            height: 38px;
+
+            border: none;
+
+            background: white;
+
+            font-size: 21px;
+            font-weight: 600;
+
+            cursor: pointer;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            transition: 0.2s;
+        }
+
+
+        /* Minus */
+
+        .qty-minus {
+            color: #2196F3;
+        }
+
+        .qty-minus:hover {
+            background: #e3f2fd;
+        }
+
+
+        /* Plus */
+
+        .qty-plus {
+            color: #2196F3;
+        }
+
+        .qty-plus:hover {
+            background: #e3f2fd;
+        }
+
+
+        /* Quantity number */
+
+        .qty-number {
+
+            min-width: 32px;
+
+            text-align: center;
+
+            font-size: 14px;
+            font-weight: 600;
+
+            color: #222;
+        }
+
+
+        /* Remove button */
+
+        .remove-form {
+            margin: 0;
+        }
+
+        .remove-item {
+
+            border: none;
+
+            background: transparent;
+
+            color: #777;
+
+            font-size: 12px;
+            font-weight: 500;
+
+            cursor: pointer;
+
+            padding: 2px 5px;
+
+            transition: 0.2s;
+        }
+
+        .remove-item:hover {
+
+            color: #e53935;
+
+            text-decoration: underline;
+        }
+
 
         /* ================= EMPTY CART ================= */
 
@@ -243,6 +376,7 @@
             color: #64748b;
             margin-bottom: 25px;
         }
+
 
         /* ================= SUMMARY ================= */
 
@@ -291,6 +425,7 @@
             color: #2196F3;
         }
 
+
         /* ================= BUTTONS ================= */
 
         .button-group {
@@ -331,6 +466,7 @@
             transform: translateY(-1px);
         }
 
+
         /* ================= OFFER ================= */
 
         .offer {
@@ -350,6 +486,7 @@
             color: #4b5563;
             font-size: 13px;
         }
+
 
         /* ================= FOOTER ================= */
 
@@ -396,6 +533,7 @@
             font-size: 13px;
         }
 
+
         /* ================= RESPONSIVE ================= */
 
         @media (max-width: 900px) {
@@ -419,8 +557,8 @@
             .navbar {
                 padding: 18px 25px;
             }
-
         }
+
 
         @media (max-width: 650px) {
 
@@ -448,14 +586,15 @@
             .footer-container {
                 grid-template-columns: 1fr;
             }
-
         }
 
     </style>
 
 </head>
 
+
 <body>
+
 
 <!-- ================= NAVBAR ================= -->
 
@@ -498,7 +637,8 @@
         </li>
 
         <li>
-            <a href="LogoutServlet" class="logout-btn">
+            <a href="LogoutServlet"
+               class="logout-btn">
                 Logout
             </a>
         </li>
@@ -528,6 +668,7 @@
 
     </div>
 
+
     <div class="hero-image">
 
         <img
@@ -556,8 +697,12 @@
         <div class="cart-table-box">
 
             <%
-                if (cartList != null && !cartList.isEmpty()) {
+
+                if (cartList != null &&
+                    !cartList.isEmpty()) {
+
             %>
+
 
             <table class="cart-table">
 
@@ -565,27 +710,49 @@
 
                     <tr>
 
-                        <th>Image</th>
-                        <th>Food</th>
-                        <th>Price</th>
-                        <th>Quantity</th>
-                        <th>Total</th>
+                        <th>
+                            Image
+                        </th>
+
+                        <th>
+                            Food
+                        </th>
+
+                        <th>
+                            Price
+                        </th>
+
+                        <th>
+                            Quantity
+                        </th>
+
+                        <th>
+                            Total
+                        </th>
 
                     </tr>
 
                 </thead>
 
+
                 <tbody>
 
+
                 <%
+
                     for (Cart cart : cartList) {
 
                         double itemTotal =
                                 cart.getPrice()
                                 * cart.getQuantity();
+
                 %>
 
+
                     <tr>
+
+
+                        <!-- FOOD IMAGE -->
 
                         <td>
 
@@ -596,49 +763,172 @@
 
                         </td>
 
+
+                        <!-- FOOD NAME -->
+
                         <td class="food-name">
 
                             <%=cart.getFoodName()%>
 
                         </td>
 
+
+                        <!-- PRICE -->
+
                         <td class="price">
 
-                            ৳<%=String.format("%.2f",
-                                    cart.getPrice())%>
+                            ৳<%=String.format(
+                                "%.2f",
+                                cart.getPrice())%>
 
                         </td>
+
+
+                        <!-- QUANTITY -->
 
                         <td>
 
-                            <span class="quantity">
+                            <div class="food-action">
 
-                                <%=cart.getQuantity()%>
 
-                            </span>
+                                <!-- QUANTITY BOX -->
+
+                                <div class="quantity-box">
+
+
+                                    <!-- MINUS -->
+
+                                    <form
+                                        action="CartServlet"
+                                        method="post">
+
+                                        <input
+                                            type="hidden"
+                                            name="action"
+                                            value="decrease">
+
+                                        <input
+                                            type="hidden"
+                                            name="cartId"
+                                            value="<%=cart.getCartId()%>">
+
+                                        <button
+                                            type="submit"
+                                            class="qty-minus">
+
+                                            −
+
+                                        </button>
+
+                                    </form>
+
+
+                                    <!-- NUMBER -->
+
+                                    <span class="qty-number">
+
+                                        <%=cart.getQuantity()%>
+
+                                    </span>
+
+
+                                    <!-- PLUS -->
+
+                                    <form
+                                        action="CartServlet"
+                                        method="post">
+
+                                        <input
+                                            type="hidden"
+                                            name="action"
+                                            value="increase">
+
+                                        <input
+                                            type="hidden"
+                                            name="cartId"
+                                            value="<%=cart.getCartId()%>">
+
+                                        <button
+                                            type="submit"
+                                            class="qty-plus">
+
+                                            +
+
+                                        </button>
+
+                                    </form>
+
+
+                                </div>
+
+
+                                <!-- REMOVE -->
+
+                                <form
+                                    action="CartServlet"
+                                    method="post"
+                                    class="remove-form">
+
+                                    <input
+                                        type="hidden"
+                                        name="action"
+                                        value="remove">
+
+                                    <input
+                                        type="hidden"
+                                        name="cartId"
+                                        value="<%=cart.getCartId()%>">
+
+                                    <button
+                                        type="submit"
+                                        class="remove-item">
+
+                                        Remove
+
+                                    </button>
+
+                                </form>
+
+
+                            </div>
 
                         </td>
+
+
+                        <!-- ITEM TOTAL -->
 
                         <td class="item-total">
 
-                            ৳<%=String.format("%.2f",
-                                    itemTotal)%>
+                            ৳<%=String.format(
+                                "%.2f",
+                                itemTotal)%>
 
                         </td>
 
+
                     </tr>
 
+
                 <%
+
                     }
+
                 %>
+
 
                 </tbody>
 
             </table>
 
+
             <%
+
                 } else {
+
             %>
+
+
+            <!-- ================= EMPTY CART ================= -->
 
             <div class="empty-cart">
 
@@ -650,8 +940,9 @@
                     You haven't added any food yet.
                 </p>
 
-                <a href="MenuServlet"
-                   class="checkout-btn">
+                <a
+                    href="MenuServlet"
+                    class="checkout-btn">
 
                     Browse Menu
 
@@ -659,8 +950,11 @@
 
             </div>
 
+
             <%
+
                 }
+
             %>
 
         </div>
@@ -675,6 +969,8 @@
             </h2>
 
 
+            <!-- SUBTOTAL -->
+
             <div class="summary-row">
 
                 <span>
@@ -682,12 +978,17 @@
                 </span>
 
                 <span>
-                    ৳<%=String.format("%.2f",
-                            subtotal)%>
+
+                    ৳<%=String.format(
+                        "%.2f",
+                        subtotal)%>
+
                 </span>
 
             </div>
 
+
+            <!-- DELIVERY -->
 
             <div class="summary-row">
 
@@ -698,26 +999,35 @@
                 <span>
 
                     <%
+
                         if (deliveryCharge == 0) {
+
                     %>
 
                         FREE
 
                     <%
+
                         } else {
+
                     %>
 
-                        ৳<%=String.format("%.2f",
-                                deliveryCharge)%>
+                        ৳<%=String.format(
+                            "%.2f",
+                            deliveryCharge)%>
 
                     <%
+
                         }
+
                     %>
 
                 </span>
 
             </div>
 
+
+            <!-- VAT -->
 
             <div class="summary-row">
 
@@ -726,8 +1036,11 @@
                 </span>
 
                 <span>
-                    ৳<%=String.format("%.2f",
-                            vat)%>
+
+                    ৳<%=String.format(
+                        "%.2f",
+                        vat)%>
+
                 </span>
 
             </div>
@@ -736,6 +1049,8 @@
             <hr>
 
 
+            <!-- GRAND TOTAL -->
+
             <div class="grand-total">
 
                 <span>
@@ -743,42 +1058,60 @@
                 </span>
 
                 <span>
-                    ৳<%=String.format("%.2f",
-                            grandTotal)%>
+
+                    ৳<%=String.format(
+                        "%.2f",
+                        grandTotal)%>
+
                 </span>
 
             </div>
 
 
             <%
-                if (cartList != null && !cartList.isEmpty()) {
+
+                if (cartList != null &&
+                    !cartList.isEmpty()) {
+
             %>
+
 
             <div class="button-group">
 
-                <a href="MenuServlet"
-                   class="continue-btn">
+
+                <!-- CONTINUE SHOPPING -->
+
+                <a
+                    href="MenuServlet"
+                    class="continue-btn">
 
                     Continue Shopping
 
                 </a>
 
-                <!-- IMPORTANT -->
-                <!-- Place Order button -->
 
-                <a href="CheckoutServlet"
-                   class="checkout-btn">
+                <!-- CHECKOUT -->
+
+                <a
+                    href="CheckoutServlet"
+                    class="checkout-btn">
 
                     Proceed to Place Order
 
                 </a>
 
+
             </div>
 
+
             <%
+
                 }
+
             %>
 
+
+            <!-- OFFER -->
 
             <div class="offer">
 
@@ -806,6 +1139,9 @@
 
     <div class="footer-container">
 
+
+        <!-- FOOD EXPRESS -->
+
         <div class="footer-box">
 
             <h3>
@@ -819,6 +1155,8 @@
 
         </div>
 
+
+        <!-- QUICK LINKS -->
 
         <div class="footer-box">
 
@@ -844,6 +1182,8 @@
 
         </div>
 
+
+        <!-- CONTACT -->
 
         <div class="footer-box">
 
@@ -878,6 +1218,7 @@
     </p>
 
 </footer>
+
 
 </body>
 

@@ -57,7 +57,7 @@
 
         <li><a href="userHome.jsp">Dashboard</a></li>
         <li><a href="MenuServlet" class="active">Menu</a></li>
-        <li><a href="cart.jsp">My Cart</a></li>
+        <li><a href="CartServlet">My Cart</a></li>
         <li><a href="orderHistory.jsp">My Orders</a></li>
         <li><a href="profile.jsp">Profile</a></li>
         <li><a href="LogoutServlet" class="login-btn">Logout</a></li>
