@@ -245,39 +245,6 @@
             background: #1976D2;
         }
 
-        /* ================= OFFER CARD ================= */
-
-        .offer-card {
-            background:
-                linear-gradient(
-                    135deg,
-                    #ffffff,
-                    #eef7ff
-                );
-
-            border: 1px solid #dbeafe;
-
-            position: relative;
-        }
-
-        .offer-badge {
-            display: inline-block;
-
-            background: #2196F3;
-
-            color: white;
-
-            padding: 5px 12px;
-
-            border-radius: 20px;
-
-            font-size: 12px;
-
-            font-weight: 600;
-
-            margin-bottom: 10px;
-        }
-
         /* ================= FOOTER ================= */
 
         footer {
@@ -520,37 +487,6 @@
                class="card-btn">
 
                 View Orders
-
-            </a>
-
-        </div>
-
-
-        <!-- CLAIM OFFER -->
-
-        <div class="dashboard-card offer-card">
-
-            <span class="offer-badge">
-                SPECIAL OFFER
-            </span>
-
-            <div class="card-icon">
-                🎁
-            </div>
-
-            <h3>
-                Claim Offers
-            </h3>
-
-            <p>
-                Get exclusive FoodExpress
-                discounts and special rewards.
-            </p>
-
-            <a href="offers.jsp"
-               class="card-btn">
-
-                Claim Offer
 
             </a>
 

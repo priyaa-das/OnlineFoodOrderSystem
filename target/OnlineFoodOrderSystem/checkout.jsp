@@ -1,15 +1,8 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
-<%@page import="java.util.List"%>
 <%@page import="com.foodexpress.model.User"%>
-<%@page import="com.foodexpress.model.Cart"%>
-<%@page import="com.foodexpress.dao.CartDAO"%>
 
 <%
-    // =====================================================
-    // LOGIN CHECK
-    // =====================================================
-
     User user =
             (User) session.getAttribute("user");
 
@@ -19,111 +12,6 @@
 
         return;
     }
-
-
-    // =====================================================
-    // CART
-    // =====================================================
-
-    CartDAO cartDAO =
-            new CartDAO();
-
-    List<Cart> cartList =
-            cartDAO.getCartItems(
-                    user.getUserId()
-            );
-
-
-    double subtotal = 0;
-
-    for (Cart cart : cartList) {
-
-        subtotal +=
-                cart.getPrice()
-                * cart.getQuantity();
-    }
-
-
-    // =====================================================
-    // CLAIMED OFFER
-    // =====================================================
-
-    String claimedOffer =
-            (String) session.getAttribute(
-                    "claimedOffer"
-            );
-
-
-    double discount = 0;
-
-    double deliveryCharge = 60;
-
-    String offerText =
-            "No offer applied";
-
-
-    // =====================================================
-    // APPLY OFFER
-    // =====================================================
-
-    if ("FOOD200".equals(claimedOffer)
-            && subtotal >= 1500) {
-
-        discount = 200;
-
-        offerText =
-                "FOOD200 - ৳200 OFF";
-    }
-
-    else if ("FREEDELIVERY".equals(
-            claimedOffer)
-            && subtotal >= 2000) {
-
-        deliveryCharge = 0;
-
-        offerText =
-                "FREEDELIVERY";
-    }
-
-    else if ("FOOD10".equals(
-            claimedOffer)
-            && subtotal >= 2500) {
-
-        discount =
-                subtotal * 0.10;
-
-        offerText =
-                "FOOD10 - 10% OFF";
-    }
-
-
-    // =====================================================
-    // AUTOMATIC FREE DELIVERY
-    // =====================================================
-
-    if (subtotal >= 2000) {
-
-        deliveryCharge = 0;
-    }
-
-
-    double discountedSubtotal =
-            subtotal - discount;
-
-    if (discountedSubtotal < 0) {
-        discountedSubtotal = 0;
-    }
-
-
-    double vat =
-            discountedSubtotal * 0.05;
-
-
-    double grandTotal =
-            discountedSubtotal
-            + deliveryCharge
-            + vat;
-
 %>
 
 <!DOCTYPE html>
@@ -134,13 +22,7 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
     <title>Checkout | FoodExpress</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet">
 
     <style>
 
@@ -149,213 +31,194 @@
         }
 
         body {
-
             margin: 0;
-
-            font-family: 'Poppins', sans-serif;
-
-            background: #f5f8fc;
-
-            color: #1e293b;
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #222;
         }
 
         .navbar {
-
-            background: #2196F3;
-
-            padding: 18px 55px;
-
+            background: white;
+            padding: 18px 7%;
             display: flex;
-
             justify-content: space-between;
-
             align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,.08);
         }
 
         .logo {
-
-            color: white;
-
             font-size: 25px;
-
-            font-weight: 700;
+            font-weight: bold;
+            color: #4f8cff;
         }
 
-        .navbar a {
-
-            color: white;
-
+        .back {
             text-decoration: none;
+            color: #555;
+            font-weight: 600;
         }
 
         .container {
-
-            max-width: 1100px;
-
+            width: 90%;
+            max-width: 900px;
             margin: 40px auto;
-
-            padding: 20px;
-
-            display: grid;
-
-            grid-template-columns:
-                1.3fr 0.7fr;
-
-            gap: 30px;
         }
 
-        .box {
+        .title {
+            margin-bottom: 25px;
+        }
 
+        .title h1 {
+            margin-bottom: 5px;
+        }
+
+        .title p {
+            color: #777;
+        }
+
+        .card {
             background: white;
-
             padding: 30px;
-
-            border-radius: 15px;
-
-            box-shadow:
-                0 5px 20px rgba(0,0,0,0.08);
+            border-radius: 18px;
+            box-shadow: 0 5px 20px rgba(0,0,0,.07);
+            margin-bottom: 25px;
         }
 
-        h1 {
-
+        .card h2 {
             margin-top: 0;
+            color: #333;
+        }
+
+        .method-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .method {
+            flex: 1;
+            border: 2px solid #ddd;
+            border-radius: 15px;
+            padding: 25px;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .method:hover {
+            border-color: #4f8cff;
+        }
+
+        .method input {
+            margin-right: 10px;
+        }
+
+        .method-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .method-desc {
+            color: #777;
+            margin-top: 8px;
+            font-size: 14px;
         }
 
         label {
-
             display: block;
-
             margin-top: 18px;
-
-            margin-bottom: 6px;
-
-            font-weight: 500;
+            margin-bottom: 7px;
+            font-weight: bold;
         }
 
         input,
         textarea,
         select {
-
             width: 100%;
-
-            padding: 12px;
-
-            border: 1px solid #cbd5e1;
-
-            border-radius: 7px;
-
-            font-family: inherit;
+            padding: 13px;
+            border: 1px solid #ddd;
+            border-radius: 9px;
+            font-size: 15px;
         }
 
         textarea {
-
-            min-height: 100px;
-
             resize: vertical;
+            min-height: 100px;
+        }
+
+        .delivery-box,
+        .pickup-box {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8faff;
+            border-radius: 12px;
+        }
+
+        .info {
+            background: #eef5ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            color: #3f5f91;
+        }
+
+        .payment-option {
+            margin-top: 12px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+
+        .payment-option input {
+            width: auto;
+            margin-right: 8px;
+        }
+
+        .summary {
+            background: #f8f9fc;
+            padding: 20px;
+            border-radius: 12px;
         }
 
         .summary-row {
-
             display: flex;
-
             justify-content: space-between;
-
-            padding: 10px 0;
-
-            color: #475569;
-        }
-
-        .discount {
-
-            color: #16a34a;
-
-            font-weight: 600;
-        }
-
-        .offer {
-
-            padding: 12px;
-
-            background: #eff6ff;
-
-            color: #1976D2;
-
-            border-radius: 8px;
-
-            margin-bottom: 15px;
-
-            font-size: 14px;
-        }
-
-        hr {
-
-            border: none;
-
-            border-top: 1px solid #e2e8f0;
-
-            margin: 15px 0;
+            padding: 8px 0;
         }
 
         .total {
-
+            border-top: 1px solid #ddd;
+            margin-top: 10px;
+            padding-top: 15px;
             font-size: 20px;
-
-            color: #1976D2;
-
-            font-weight: 700;
+            font-weight: bold;
         }
 
-        button {
-
+        .place-btn {
             width: 100%;
-
-            margin-top: 25px;
-
-            padding: 13px;
-
+            padding: 16px;
             border: none;
-
-            border-radius: 8px;
-
-            background: #2196F3;
-
+            background: #4f8cff;
             color: white;
-
-            font-size: 16px;
-
-            font-weight: 600;
-
+            font-size: 17px;
+            font-weight: bold;
+            border-radius: 10px;
             cursor: pointer;
+            margin-top: 20px;
         }
 
-        button:hover {
-
-            background: #1976D2;
+        .place-btn:hover {
+            background: #3978ed;
         }
 
-        .back {
+        @media(max-width:700px) {
 
-            display: block;
-
-            margin-top: 15px;
-
-            text-align: center;
-
-            color: #1976D2;
-
-            text-decoration: none;
-        }
-
-        @media(max-width:800px) {
-
-            .container {
-
-                grid-template-columns: 1fr;
+            .method-container {
+                flex-direction: column;
             }
 
-            .navbar {
-
-                padding: 15px 20px;
+            .container {
+                width: 94%;
             }
         }
 
@@ -363,231 +226,508 @@
 
 </head>
 
+
 <body>
 
 
-<!-- NAVBAR -->
+<!-- ==========================================
+     NAVBAR
+========================================== -->
 
-<nav class="navbar">
+<div class="navbar">
 
     <div class="logo">
         FoodExpress
     </div>
 
-    <a href="CartServlet">
+    <a
+        href="CartServlet"
+        class="back">
         ← Back to Cart
     </a>
 
-</nav>
+</div>
+
 
 
 <div class="container">
 
 
-    <!-- =========================================
-         CUSTOMER INFORMATION
-         ========================================= -->
+    <!-- ==========================================
+         TITLE
+    ========================================== -->
 
-    <div class="box">
+    <div class="title">
 
         <h1>
             Checkout
         </h1>
 
         <p>
-            Complete your information to place
-            your FoodExpress order.
+            Choose how you want to receive your order.
         </p>
 
+    </div>
 
-        <form action="PlaceOrderServlet"
-              method="post">
+
+
+    <form
+        action="PlaceOrderServlet"
+        method="post"
+        onsubmit="return validateCheckout();">
+
+
+
+        <!-- ==========================================
+             CONTACT INFORMATION
+        ========================================== -->
+
+        <div class="card">
+
+            <h2>
+                Contact Information
+            </h2>
 
 
             <label>
                 Phone Number
             </label>
 
-            <input type="text"
-                   name="phone"
-                   value="<%=user.getPhone()%>"
-                   required>
+            <input
+                type="text"
+                name="phone"
+                placeholder="Enter your phone number"
+                value="<%= user.getPhone() == null ? "" : user.getPhone() %>"
+                required>
 
 
-            <label>
-                Delivery Address
-            </label>
-
-            <textarea name="address"
-                      placeholder="Enter your delivery address"
-                      required></textarea>
+        </div>
 
 
-            <label>
+
+        <!-- ==========================================
+             DELIVERY METHOD
+        ========================================== -->
+
+        <div class="card">
+
+            <h2>
+                Receive Your Order
+            </h2>
+
+
+            <div class="method-container">
+
+
+                <!-- PICKUP -->
+
+                <label class="method">
+
+                    <input
+                        type="radio"
+                        name="deliveryMethod"
+                        value="Pickup"
+                        onclick="showPickup()">
+
+                    <span class="method-title">
+                        Pickup
+                    </span>
+
+                    <div class="method-desc">
+
+                        Pick up your order from our cafeteria.
+
+                    </div>
+
+                </label>
+
+
+
+                <!-- DELIVERY -->
+
+                <label class="method">
+
+                    <input
+                        type="radio"
+                        name="deliveryMethod"
+                        value="Delivery"
+                        onclick="showDelivery()">
+
+                    <span class="method-title">
+                        Home Delivery
+                    </span>
+
+                    <div class="method-desc">
+
+                        Get your food delivered to your location.
+
+                    </div>
+
+                </label>
+
+
+            </div>
+
+
+
+            <!-- ======================================
+                 PICKUP SECTION
+            ======================================= -->
+
+            <div
+                id="pickupBox"
+                class="pickup-box">
+
+
+                <label>
+                    Select Pickup Time
+                </label>
+
+
+                <select
+                    name="pickupTime"
+                    id="pickupTime">
+
+                    <option value="">
+                        Select a time
+                    </option>
+
+                    <option value="12:00 PM - 12:30 PM">
+                        12:00 PM - 12:30 PM
+                    </option>
+
+                    <option value="12:30 PM - 1:00 PM">
+                        12:30 PM - 1:00 PM
+                    </option>
+
+                    <option value="1:00 PM - 1:30 PM">
+                        1:00 PM - 1:30 PM
+                    </option>
+
+                    <option value="1:30 PM - 2:00 PM">
+                        1:30 PM - 2:00 PM
+                    </option>
+
+                    <option value="5:00 PM - 5:30 PM">
+                        5:00 PM - 5:30 PM
+                    </option>
+
+                    <option value="5:30 PM - 6:00 PM">
+                        5:30 PM - 6:00 PM
+                    </option>
+
+                    <option value="6:00 PM - 6:30 PM">
+                        6:00 PM - 6:30 PM
+                    </option>
+
+                    <option value="6:30 PM - 7:00 PM">
+                        6:30 PM - 7:00 PM
+                    </option>
+
+                    <option value="7:00 PM - 7:30 PM">
+                        7:00 PM - 7:30 PM
+                    </option>
+
+                </select>
+
+
+                <div class="info">
+
+                    Your order will be prepared before the selected pickup time.
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- ======================================
+                 DELIVERY SECTION
+            ======================================= -->
+
+            <div
+                id="deliveryBox"
+                class="delivery-box">
+
+
+                <label>
+                    Delivery Address
+                </label>
+
+
+                <textarea
+                    name="address"
+                    id="address"
+                    placeholder="Enter your full delivery address"><%= user.getAddress() == null ? "" : user.getAddress() %></textarea>
+
+
+                <div class="info">
+
+                    Delivery time depends on your location.
+                    Nearby locations usually receive orders faster.
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- ==========================================
+             PAYMENT
+        ========================================== -->
+
+        <div class="card">
+
+            <h2>
                 Payment Method
-            </label>
+            </h2>
 
-            <select name="paymentMethod"
+
+            <label class="payment-option">
+
+                <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="Cash on Delivery"
                     required>
 
-                <option value="">
-                    Select Payment Method
-                </option>
+                Cash on Delivery
 
-                <option value="Cash on Delivery">
-                    Cash on Delivery
-                </option>
-
-                <option value="Online Payment">
-                    Online Payment
-                </option>
-
-            </select>
+            </label>
 
 
-            <button type="submit">
+            <label class="payment-option">
 
-                Place Order -
-                ৳<%=String.format(
-                    "%.2f",
-                    grandTotal
-                )%>
+                <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="Online Payment">
+
+                Online Payment
+
+            </label>
+
+
+        </div>
+
+
+
+        <!-- ==========================================
+             ORDER SUMMARY
+        ========================================== -->
+
+        <div class="card">
+
+            <h2>
+                Order Summary
+            </h2>
+
+
+            <div class="summary">
+
+                <div class="summary-row">
+
+                    <span>
+                        Your cart
+                    </span>
+
+                    <span>
+                        Items
+                    </span>
+
+                </div>
+
+
+                <div class="summary-row">
+
+                    <span>
+                        Delivery
+                    </span>
+
+                    <span>
+                        Calculated at order
+                    </span>
+
+                </div>
+
+
+                <div class="summary-row">
+
+                    <span>
+                        VAT
+                    </span>
+
+                    <span>
+                        5%
+                    </span>
+
+                </div>
+
+
+                <div class="summary-row total">
+
+                    <span>
+                        Total
+                    </span>
+
+                    <span>
+                        Calculated at checkout
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="place-btn">
+
+                Place Order
 
             </button>
 
-        </form>
-
-    </div>
-
-
-    <!-- =========================================
-         ORDER SUMMARY
-         ========================================= -->
-
-    <div class="box">
-
-        <h2>
-            Order Summary
-        </h2>
-
-
-        <div class="offer">
-
-            <strong>
-                Applied Offer:
-            </strong>
-
-            <br>
-
-            <%=offerText%>
 
         </div>
 
 
-        <div class="summary-row">
+    </form>
 
-            <span>
-                Subtotal
-            </span>
-
-            <span>
-                ৳<%=String.format(
-                    "%.2f",
-                    subtotal
-                )%>
-            </span>
-
-        </div>
-
-
-        <div class="summary-row discount">
-
-            <span>
-                Discount
-            </span>
-
-            <span>
-                - ৳<%=String.format(
-                    "%.2f",
-                    discount
-                )%>
-            </span>
-
-        </div>
-
-
-        <div class="summary-row">
-
-            <span>
-                Delivery
-            </span>
-
-            <span>
-
-                <%
-                    if (deliveryCharge == 0) {
-                %>
-
-                    <strong>
-                        FREE
-                    </strong>
-
-                <%
-                    } else {
-                %>
-
-                    ৳<%=String.format(
-                        "%.2f",
-                        deliveryCharge
-                    )%>
-
-                <%
-                    }
-                %>
-
-            </span>
-
-        </div>
-
-
-        <div class="summary-row">
-
-            <span>
-                VAT (5%)
-            </span>
-
-            <span>
-                ৳<%=String.format(
-                    "%.2f",
-                    vat
-                )%>
-            </span>
-
-        </div>
-
-
-        <hr>
-
-
-        <div class="summary-row total">
-
-            <span>
-                Grand Total
-            </span>
-
-            <span>
-                ৳<%=String.format(
-                    "%.2f",
-                    grandTotal
-                )%>
-            </span>
-
-        </div>
-
-
-    </div>
 
 </div>
+
+
+
+<script>
+
+
+    // ==========================================
+    // SHOW PICKUP
+    // ==========================================
+
+    function showPickup() {
+
+        document.getElementById(
+                "pickupBox"
+        ).style.display = "block";
+
+
+        document.getElementById(
+                "deliveryBox"
+        ).style.display = "none";
+
+
+        document.getElementById(
+                "address"
+        ).required = false;
+
+
+        document.getElementById(
+                "pickupTime"
+        ).required = true;
+    }
+
+
+
+    // ==========================================
+    // SHOW DELIVERY
+    // ==========================================
+
+    function showDelivery() {
+
+        document.getElementById(
+                "deliveryBox"
+        ).style.display = "block";
+
+
+        document.getElementById(
+                "pickupBox"
+        ).style.display = "none";
+
+
+        document.getElementById(
+                "address"
+        ).required = true;
+
+
+        document.getElementById(
+                "pickupTime"
+        ).required = false;
+    }
+
+
+
+    // ==========================================
+    // VALIDATION
+    // ==========================================
+
+    function validateCheckout() {
+
+
+        const method =
+                document.querySelector(
+                        'input[name="deliveryMethod"]:checked'
+                );
+
+
+        if (!method) {
+
+            alert(
+                    "Please select Pickup or Home Delivery."
+            );
+
+            return false;
+        }
+
+
+        if (method.value === "Pickup") {
+
+            const pickup =
+                    document.getElementById(
+                            "pickupTime"
+                    ).value;
+
+
+            if (!pickup) {
+
+                alert(
+                        "Please select a pickup time."
+                );
+
+                return false;
+            }
+        }
+
+
+        if (method.value === "Delivery") {
+
+            const address =
+                    document.getElementById(
+                            "address"
+                    ).value.trim();
+
+
+            if (!address) {
+
+                alert(
+                        "Please enter your delivery address."
+                );
+
+                return false;
+            }
+        }
+
+
+        return true;
+    }
+
+</script>
+
 
 </body>
 

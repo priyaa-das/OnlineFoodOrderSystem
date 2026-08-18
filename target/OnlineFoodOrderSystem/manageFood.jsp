@@ -1,6 +1,6 @@
 <%-- 
     Document   : manageFood
-    Created on : Aug 14, 2026, 1:25:01 PM
+    Created on : Aug 14, 2026, 1:25:01 PM
     Author     : DELL
 --%>
 
@@ -67,7 +67,6 @@
             </a>
         </li>
 
-
         <li>
             <a href="LogoutServlet"
                class="login-btn">
@@ -114,6 +113,43 @@
     if (foodList != null) {
 
         for (Food food : foodList) {
+
+            String categoryName;
+
+            switch (food.getCategoryId()) {
+
+                case 1:
+                    categoryName = "Burger";
+                    break;
+
+                case 2:
+                    categoryName = "Pizza";
+                    break;
+
+                case 3:
+                    categoryName = "Pasta";
+                    break;
+
+                case 4:
+                    categoryName = "Steak";
+                    break;
+
+                case 5:
+                    categoryName = "Seafood";
+                    break;
+
+                case 6:
+                    categoryName = "Dessert";
+                    break;
+
+                case 7:
+                    categoryName = "Beverages";
+                    break;
+
+                default:
+                    categoryName = "Other";
+                    break;
+            }
 %>
 
         <tr>
@@ -136,11 +172,11 @@
             </td>
 
             <td>
-                <%=food.getCategoryId()%>
+                <%=categoryName%>
             </td>
 
             <td>
-                ৳<%=food.getPrice()%>
+                ৳<%=String.format("%.2f", food.getPrice())%>
             </td>
 
             <td>

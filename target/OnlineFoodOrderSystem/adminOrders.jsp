@@ -60,6 +60,25 @@
             padding: 6px;
         }
 
+        input[type="time"] {
+            padding: 6px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .update-btn {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 7px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .update-btn:hover {
+            background: #1976D2;
+        }
+
         .delete {
             background: #dc3545;
             color: white;
@@ -70,6 +89,21 @@
 
         .delete:hover {
             background: #b02a37;
+        }
+
+        .method {
+            font-weight: 600;
+            color: #1565c0;
+        }
+
+        .pickup {
+            color: #7b1fa2;
+            font-weight: 600;
+        }
+
+        .delivery {
+            color: #2e7d32;
+            font-weight: 600;
         }
 
         .empty {
@@ -113,6 +147,9 @@
                 <th>Order Status</th>
                 <th>Payment</th>
                 <th>Address</th>
+                <th>Method</th>
+                <th>Pickup Time</th>
+                <th>Estimated Delivery Time</th>
                 <th>Date</th>
                 <th>Action</th>
 
@@ -132,35 +169,62 @@
 
                     for (Order order : orders) {
 
+                        String deliveryMethod =
+                                order.getDeliveryMethod();
+
+                        if (deliveryMethod == null ||
+                            deliveryMethod.trim().isEmpty()) {
+
+                            deliveryMethod = "Not Available";
+
+                        }
+
+                        boolean isPickup =
+                                "Pickup".equalsIgnoreCase(
+                                        deliveryMethod
+                                );
+
             %>
 
 
             <tr>
+
+                <!-- ORDER ID -->
 
                 <td>
                     <%= order.getOrderId() %>
                 </td>
 
 
+                <!-- CUSTOMER -->
+
                 <td>
                     <%= order.getCustomerName() %>
                 </td>
 
+
+                <!-- EMAIL -->
 
                 <td>
                     <%= order.getEmail() %>
                 </td>
 
 
+                <!-- PHONE -->
+
                 <td>
                     <%= order.getPhone() %>
                 </td>
 
 
+                <!-- TOTAL -->
+
                 <td>
                     ৳ <%= order.getTotalAmount() %>
                 </td>
 
+
+                <!-- ORDER STATUS -->
 
                 <td>
 
@@ -189,8 +253,9 @@
 
                             <option
                                 value="Pending"
-                                <%= "Pending".equals(order.getOrderStatus())
-                                ? "selected" : "" %>
+                                <%= "Pending".equalsIgnoreCase(
+                                    order.getOrderStatus())
+                                    ? "selected" : "" %>
                             >
                                 Pending
                             </option>
@@ -198,8 +263,9 @@
 
                             <option
                                 value="Preparing"
-                                <%= "Preparing".equals(order.getOrderStatus())
-                                ? "selected" : "" %>
+                                <%= "Preparing".equalsIgnoreCase(
+                                    order.getOrderStatus())
+                                    ? "selected" : "" %>
                             >
                                 Preparing
                             </option>
@@ -207,8 +273,9 @@
 
                             <option
                                 value="Delivered"
-                                <%= "Delivered".equals(order.getOrderStatus())
-                                ? "selected" : "" %>
+                                <%= "Delivered".equalsIgnoreCase(
+                                    order.getOrderStatus())
+                                    ? "selected" : "" %>
                             >
                                 Delivered
                             </option>
@@ -216,8 +283,9 @@
 
                             <option
                                 value="Cancelled"
-                                <%= "Cancelled".equals(order.getOrderStatus())
-                                ? "selected" : "" %>
+                                <%= "Cancelled".equalsIgnoreCase(
+                                    order.getOrderStatus())
+                                    ? "selected" : "" %>
                             >
                                 Cancelled
                             </option>
@@ -229,20 +297,133 @@
                 </td>
 
 
+                <!-- PAYMENT -->
+
                 <td>
                     <%= order.getPaymentStatus() %>
                 </td>
 
 
+                <!-- ADDRESS -->
+
                 <td>
-                    <%= order.getDeliveryAddress() %>
+                    <%= order.getDeliveryAddress() == null
+                            ? "N/A"
+                            : order.getDeliveryAddress() %>
                 </td>
 
+
+                <!-- DELIVERY METHOD -->
+                <!-- ADMIN CANNOT CHANGE THIS -->
+
+                <td>
+
+                    <span class="method
+                        <%=isPickup ? "pickup" : "delivery"%>">
+
+                        <%=deliveryMethod%>
+
+                    </span>
+
+                </td>
+
+
+                <!-- PICKUP TIME -->
+
+                <td>
+
+                    <%
+                        if (isPickup &&
+                            order.getPickupTime() != null &&
+                            !order.getPickupTime()
+                                   .trim()
+                                   .isEmpty()) {
+                    %>
+
+                        <%=order.getPickupTime()%>
+
+                    <%
+                        } else if (isPickup) {
+                    %>
+
+                        Not Set
+
+                    <%
+                        } else {
+                    %>
+
+                        N/A
+
+                    <%
+                        }
+                    %>
+
+                </td>
+
+
+                <!-- ESTIMATED DELIVERY TIME -->
+                <!-- ADMIN CAN UPDATE THIS -->
+
+                <td>
+
+                    <%
+                        if (!isPickup) {
+                    %>
+
+                        <form
+                            action="<%=request.getContextPath()%>/AdminOrderTimeServlet"
+                            method="post"
+                            style="display:flex;
+                                   flex-direction:column;
+                                   gap:6px;
+                                   align-items:center;"
+                        >
+
+                            <input
+                                type="hidden"
+                                name="orderId"
+                                value="<%=order.getOrderId()%>"
+                            >
+
+                            <input
+                                type="time"
+                                name="estimatedDeliveryTime"
+                                value="<%=order.getEstimatedDeliveryTime() == null
+                                        ? ""
+                                        : order.getEstimatedDeliveryTime()%>"
+                                required
+                            >
+
+                            <button
+                                type="submit"
+                                class="update-btn"
+                            >
+                                Update Time
+                            </button>
+
+                        </form>
+
+                    <%
+                        } else {
+                    %>
+
+                        N/A
+
+                    <%
+                        }
+                    %>
+
+                </td>
+
+
+                <!-- DATE -->
 
                 <td>
                     <%= order.getOrderDate() %>
                 </td>
 
+
+                <!-- DELETE -->
 
                 <td>
 
@@ -271,10 +452,12 @@
             <tr>
 
                 <td
-                    colspan="10"
+                    colspan="13"
                     class="empty"
                 >
+
                     No orders found.
+
                 </td>
 
             </tr>

@@ -29,16 +29,47 @@
 
     <ul class="nav-links">
 
-        <li><a href="index.jsp">Home</a></li>
-        <li><a href="menu.jsp">Menu</a></li>
-        <li><a href="offers.jsp">Offers</a></li>
-        <li><a href="about.jsp">About</a></li>
-        <li><a href="contact.jsp">Contact</a></li>
-        <li><a href="login.jsp" class="login-btn">Login</a></li>
+        <li>
+            <a href="index.jsp">
+                Home
+            </a>
+        </li>
+
+        <li>
+            <a href="menu.jsp">
+                Menu
+            </a>
+        </li>
+
+        <li>
+            <a href="offers.jsp">
+                Offers
+            </a>
+        </li>
+
+        <li>
+            <a href="about.jsp">
+                About
+            </a>
+        </li>
+
+        <li>
+            <a href="contact.jsp">
+                Contact
+            </a>
+        </li>
+
+        <li>
+            <a href="login.jsp"
+               class="login-btn">
+                Login
+            </a>
+        </li>
 
     </ul>
 
 </nav>
+
 
 <!-- ================= PAGE BANNER ================= -->
 
@@ -46,106 +77,120 @@
 
     <div class="banner-content">
 
-        <h1>Contact Us</h1>
+        <h1>
+            Contact Us
+        </h1>
 
         <p>
-
-            We'd love to hear from you. Feel free to contact us anytime.
-
+            We'd love to hear from you. Visit us or explore our online services anytime.
         </p>
 
     </div>
 
 </section>
 
+
 <!-- ================= CONTACT SECTION ================= -->
 
 <section class="contact-section">
 
-    <!-- Contact Information -->
+
+    <!-- ================= RESTAURANT INFORMATION ================= -->
 
     <div class="contact-info">
 
-        <h2>Get In Touch</h2>
+        <h2>
+            Get In Touch
+        </h2>
 
-        <p><strong>Address:</strong><br>
-        Zindabazar, Sylhet, Bangladesh</p>
 
-        <p><strong>Phone:</strong><br>
-        +880 1700-123456</p>
+        <p>
 
-        <p><strong>Email:</strong><br>
-        info@foodexpress.com</p>
+            <strong>Opening Hours:</strong><br>
 
-        <p><strong>Opening Hours:</strong><br>
-        Saturday - Thursday<br>
-        10:00 AM - 10:00 PM</p>
+            Saturday - Thursday<br>
 
-        <p><strong>Customer Support:</strong><br>
-        Available 24/7 for online assistance.</p>
+            10:00 AM - 10:00 PM
+
+        </p>
+
+
+        <p>
+
+            <strong>Customer Support:</strong><br>
+
+            Available 24/7 for online assistance.
+
+        </p>
+
+
+        <p>
+
+            <strong>Online Ordering:</strong><br>
+
+            Browse our menu, add your favorite food
+            to the cart and place your order easily.
+
+        </p>
+
 
     </div>
 
 
 
-    <!-- Contact Form -->
+    <!-- ================= ONLINE ORDERING ================= -->
 
     <div class="contact-form">
 
-        <h2>Send Us a Message</h2>
+        <h2>
+            Order Online
+        </h2>
 
-        <form action="ContactServlet" method="post">
+        <p>
 
-            <input type="text"
-                   name="fullname"
-                   placeholder="Full Name"
-                   required>
+            Ready to enjoy delicious food?
 
-            <input type="email"
-                   name="email"
-                   placeholder="Email Address"
-                   required>
+            Explore our menu and place your order
+            directly through FoodExpress.
 
-            <input type="text"
-                   name="subject"
-                   placeholder="Subject"
-                   required>
+        </p>
 
-            <textarea
-                name="message"
-                placeholder="Write your message..."
-                required></textarea>
 
-            <button type="submit">
+        <a href="menu.jsp"
+           class="primary-btn">
 
-                Send Message
+            Explore Menu
 
-            </button>
-
-        </form>
+        </a>
 
     </div>
 
 </section>
+
+
 <!-- ================= GOOGLE MAP ================= -->
 
 <section class="feature-highlight">
 
-    <h2>Find Us</h2>
+    <h2>
+        How to Find Us
+    </h2>
 
     <p>
 
-        Visit our restaurant or contact us online for quick and reliable service.
+        Visit us at Tilagor, Sylhet, Bangladesh.
 
     </p>
 
+
     <iframe
-        src="https://www.google.com/maps?q=Zindabazar,Sylhet,Bangladesh&output=embed"
+        src="https://www.google.com/maps?q=Tilagor,Sylhet,Bangladesh&output=embed"
         width="100%"
         height="400"
         style="border:0; border-radius:20px; margin-top:30px;"
         allowfullscreen=""
         loading="lazy">
+
     </iframe>
 
 </section>
@@ -156,7 +201,9 @@
 
 <section class="featured">
 
-    <h2>Frequently Asked Questions</h2>
+    <h2>
+        Frequently Asked Questions
+    </h2>
 
     <p>
 
@@ -164,13 +211,17 @@
 
     </p>
 
+
     <div class="food-container">
+
 
         <div class="card">
 
             <div class="food-info">
 
-                <h3>How can I place an order?</h3>
+                <h3>
+                    How can I place an order?
+                </h3>
 
                 <p>
 
@@ -183,11 +234,14 @@
 
         </div>
 
+
         <div class="card">
 
             <div class="food-info">
 
-                <h3>What are your delivery hours?</h3>
+                <h3>
+                    What are your delivery hours?
+                </h3>
 
                 <p>
 
@@ -199,11 +253,14 @@
 
         </div>
 
+
         <div class="card">
 
             <div class="food-info">
 
-                <h3>Do you offer online payment?</h3>
+                <h3>
+                    Do you offer online payment?
+                </h3>
 
                 <p>
 
@@ -214,6 +271,7 @@
             </div>
 
         </div>
+
 
     </div>
 
@@ -227,45 +285,54 @@
 
     <div class="footer-container">
 
+
         <div class="footer-box">
 
-            <h3>FoodExpress</h3>
+            <h3>
+                FoodExpress
+            </h3>
 
             <p>
 
-                Your trusted online food ordering platform, offering delicious
-                meals, fast delivery and outstanding customer service.
+                Your trusted online food ordering platform,
+                offering delicious meals, fast delivery
+                and outstanding customer service.
 
             </p>
 
         </div>
 
-        <div class="footer-box">
-
-            <h3>Quick Links</h3>
-
-            <a href="index.jsp">Home</a>
-            <a href="menu.jsp">Menu</a>
-            <a href="offers.jsp">Offers</a>
-            <a href="about.jsp">About</a>
-
-        </div>
 
         <div class="footer-box">
 
-            <h3>Contact</h3>
+            <h3>
+                Quick Links
+            </h3>
 
-            <p>Email : info@foodexpress.com</p>
+            <a href="index.jsp">
+                Home
+            </a>
 
-            <p>Phone : +880 1700-123456</p>
+            <a href="menu.jsp">
+                Menu
+            </a>
 
-            <p>Address : Zindabazar, Sylhet, Bangladesh</p>
+            <a href="offers.jsp">
+                Offers
+            </a>
+
+            <a href="about.jsp">
+                About
+            </a>
 
         </div>
+
 
     </div>
 
+
     <hr>
+
 
     <p class="copyright">
 
@@ -275,5 +342,7 @@
 
 </footer>
 
+
 </body>
+
 </html>

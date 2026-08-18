@@ -2,6 +2,7 @@
 <%@page import="java.util.*"%>
 <%@page import="com.foodexpress.model.User"%>
 <%@page import="com.foodexpress.model.Cart"%>
+<%@page import="com.foodexpress.model.Offer"%>
 
 <%
     User user = (User) session.getAttribute("user");
@@ -14,17 +15,54 @@
     List<Cart> cartList =
             (List<Cart>) request.getAttribute("cartList");
 
-    double subtotal = 0;
+    List<Offer> offerList =
+            (List<Offer>) request.getAttribute("offerList");
 
-    if (cartList != null) {
-        for (Cart cart : cartList) {
-            subtotal += cart.getPrice() * cart.getQuantity();
-        }
+    double subtotal = 0;
+    double discountAmount = 0;
+    double discountedSubtotal = 0;
+    double deliveryCharge = 0;
+    double vat = 0;
+    double grandTotal = 0;
+
+    if (request.getAttribute("subtotal") != null) {
+        subtotal =
+                (Double) request.getAttribute("subtotal");
     }
 
-    double deliveryCharge = (subtotal >= 2000) ? 0 : 60;
-    double vat = subtotal * 0.05;
-    double grandTotal = subtotal + deliveryCharge + vat;
+    if (request.getAttribute("discountAmount") != null) {
+        discountAmount =
+                (Double) request.getAttribute("discountAmount");
+    }
+
+    if (request.getAttribute("discountedSubtotal") != null) {
+        discountedSubtotal =
+                (Double) request.getAttribute("discountedSubtotal");
+    }
+
+    if (request.getAttribute("deliveryCharge") != null) {
+        deliveryCharge =
+                (Double) request.getAttribute("deliveryCharge");
+    }
+
+    if (request.getAttribute("vat") != null) {
+        vat =
+                (Double) request.getAttribute("vat");
+    }
+
+    if (request.getAttribute("grandTotal") != null) {
+        grandTotal =
+                (Double) request.getAttribute("grandTotal");
+    }
+
+    Offer appliedOffer =
+            (Offer) request.getAttribute("appliedOffer");
+
+    String claimMessage =
+            (String) request.getAttribute("claimMessage");
+
+    String claimError =
+            (String) request.getAttribute("claimError");
 %>
 
 <!DOCTYPE html>
@@ -45,7 +83,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
           rel="stylesheet">
 
-
     <style>
 
         * {
@@ -58,7 +95,6 @@
             background: #f5f8fc;
             color: #1e293b;
         }
-
 
         /* ================= NAVBAR ================= */
 
@@ -108,7 +144,6 @@
             border-radius: 6px;
         }
 
-
         /* ================= HERO ================= */
 
         .cart-hero {
@@ -156,7 +191,6 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
 
-
         /* ================= MAIN ================= */
 
         .cart-section {
@@ -174,7 +208,6 @@
             gap: 30px;
             align-items: start;
         }
-
 
         /* ================= TABLE ================= */
 
@@ -226,10 +259,7 @@
             font-weight: 700;
         }
 
-
-        /* ================================================= */
-        /* FOODPANDA STYLE QUANTITY SECTION                  */
-        /* ================================================= */
+        /* ================= QUANTITY ================= */
 
         .food-action {
             display: flex;
@@ -238,127 +268,76 @@
             gap: 7px;
         }
 
-
-        /* Quantity outer box */
-
         .quantity-box {
             display: inline-flex;
             align-items: center;
-
             height: 38px;
-
             border: 1px solid #d9d9d9;
             border-radius: 20px;
-
             background: #ffffff;
-
             overflow: hidden;
-
             box-shadow: 0 2px 6px rgba(0,0,0,0.06);
         }
-
-
-        /* Forms inside quantity */
 
         .quantity-box form {
             margin: 0;
             padding: 0;
         }
 
-
-        /* Plus and Minus buttons */
-
         .qty-minus,
         .qty-plus {
-
             width: 38px;
             height: 38px;
-
             border: none;
-
             background: white;
-
             font-size: 21px;
             font-weight: 600;
-
             cursor: pointer;
-
             display: flex;
             align-items: center;
             justify-content: center;
-
             transition: 0.2s;
         }
 
-
-        /* Minus */
-
-        .qty-minus {
-            color: #2196F3;
-        }
-
-        .qty-minus:hover {
-            background: #e3f2fd;
-        }
-
-
-        /* Plus */
-
+        .qty-minus,
         .qty-plus {
             color: #2196F3;
         }
 
+        .qty-minus:hover,
         .qty-plus:hover {
             background: #e3f2fd;
         }
 
-
-        /* Quantity number */
-
         .qty-number {
-
             min-width: 32px;
-
             text-align: center;
-
             font-size: 14px;
             font-weight: 600;
-
             color: #222;
         }
 
-
-        /* Remove button */
+        /* ================= REMOVE ================= */
 
         .remove-form {
             margin: 0;
         }
 
         .remove-item {
-
             border: none;
-
             background: transparent;
-
             color: #777;
-
             font-size: 12px;
             font-weight: 500;
-
             cursor: pointer;
-
             padding: 2px 5px;
-
             transition: 0.2s;
         }
 
         .remove-item:hover {
-
             color: #e53935;
-
             text-decoration: underline;
         }
-
 
         /* ================= EMPTY CART ================= */
 
@@ -376,7 +355,6 @@
             color: #64748b;
             margin-bottom: 25px;
         }
-
 
         /* ================= SUMMARY ================= */
 
@@ -407,6 +385,11 @@
             font-weight: 500;
         }
 
+        .discount-row span:last-child {
+            color: #2e7d32 !important;
+            font-weight: 700;
+        }
+
         .summary hr {
             border: none;
             border-top: 1px solid #e5e7eb;
@@ -424,7 +407,6 @@
         .grand-total span:last-child {
             color: #2196F3;
         }
-
 
         /* ================= BUTTONS ================= */
 
@@ -466,8 +448,108 @@
             transform: translateY(-1px);
         }
 
+        /* ================= OFFERS ================= */
 
-        /* ================= OFFER ================= */
+        .offers-section {
+            margin-top: 30px;
+        }
+
+        .offers-title {
+            font-size: 22px;
+            margin-bottom: 18px;
+            color: #172554;
+        }
+
+        .offer-card {
+            background: #ffffff;
+            border: 1px solid #dbeafe;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .offer-card h3 {
+            margin: 0 0 8px;
+            color: #1565c0;
+            font-size: 18px;
+        }
+
+        .offer-card p {
+            margin: 5px 0;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .discount-text {
+            color: #2e7d32 !important;
+            font-weight: 600;
+        }
+
+        .claim-btn {
+            width: 100%;
+            margin-top: 12px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 7px;
+            background: #2196F3;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .claim-btn:hover {
+            background: #1976d2;
+            transform: translateY(-1px);
+        }
+
+        /* ================= APPLIED OFFER ================= */
+
+        .applied-offer-box {
+            margin: 18px 0;
+            padding: 13px 15px;
+            background: #e8f5e9;
+            border-left: 4px solid #43a047;
+            border-radius: 8px;
+        }
+
+        .applied-offer-box strong {
+            color: #2e7d32;
+        }
+
+        .applied-offer-box p {
+            margin: 5px 0 0;
+            color: #4b5563;
+            font-size: 13px;
+        }
+
+        /* ================= MESSAGES ================= */
+
+        .success-message {
+            margin-bottom: 20px;
+            padding: 13px 16px;
+            border-radius: 8px;
+            background: #e8f5e9;
+            border-left: 4px solid #43a047;
+            color: #2e7d32;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .error-message {
+            margin-bottom: 20px;
+            padding: 13px 16px;
+            border-radius: 8px;
+            background: #ffebee;
+            border-left: 4px solid #e53935;
+            color: #c62828;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* ================= FREE DELIVERY ================= */
 
         .offer {
             margin-top: 30px;
@@ -486,7 +568,6 @@
             color: #4b5563;
             font-size: 13px;
         }
-
 
         /* ================= FOOTER ================= */
 
@@ -533,7 +614,6 @@
             font-size: 13px;
         }
 
-
         /* ================= RESPONSIVE ================= */
 
         @media (max-width: 900px) {
@@ -558,7 +638,6 @@
                 padding: 18px 25px;
             }
         }
-
 
         @media (max-width: 650px) {
 
@@ -591,7 +670,6 @@
     </style>
 
 </head>
-
 
 <body>
 
@@ -668,7 +746,6 @@
 
     </div>
 
-
     <div class="hero-image">
 
         <img
@@ -689,123 +766,192 @@
     </h2>
 
 
+    <!-- ================= CLAIM MESSAGE ================= -->
+
+    <% if (claimMessage != null &&
+           !claimMessage.isEmpty()) { %>
+
+        <div class="success-message">
+            <%= claimMessage %>
+        </div>
+
+    <% } %>
+
+
+    <% if (claimError != null &&
+           !claimError.isEmpty()) { %>
+
+        <div class="error-message">
+            <%= claimError %>
+        </div>
+
+    <% } %>
+
+
     <div class="cart-container">
 
 
         <!-- ================= CART ITEMS ================= -->
 
-        <div class="cart-table-box">
+        <div>
 
-            <%
-
-                if (cartList != null &&
-                    !cartList.isEmpty()) {
-
-            %>
-
-
-            <table class="cart-table">
-
-                <thead>
-
-                    <tr>
-
-                        <th>
-                            Image
-                        </th>
-
-                        <th>
-                            Food
-                        </th>
-
-                        <th>
-                            Price
-                        </th>
-
-                        <th>
-                            Quantity
-                        </th>
-
-                        <th>
-                            Total
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody>
-
+            <div class="cart-table-box">
 
                 <%
-
-                    for (Cart cart : cartList) {
-
-                        double itemTotal =
-                                cart.getPrice()
-                                * cart.getQuantity();
-
+                    if (cartList != null &&
+                        !cartList.isEmpty()) {
                 %>
 
+                <table class="cart-table">
 
-                    <tr>
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Image
+                            </th>
+
+                            <th>
+                                Food
+                            </th>
+
+                            <th>
+                                Price
+                            </th>
+
+                            <th>
+                                Quantity
+                            </th>
+
+                            <th>
+                                Total
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    <%
+                        for (Cart cart : cartList) {
+
+                            double itemTotal =
+                                    cart.getPrice()
+                                    * cart.getQuantity();
+                    %>
+
+                        <tr>
+
+                            <td>
+
+                                <img
+                                    src="<%=cart.getImageUrl()%>"
+                                    alt="<%=cart.getFoodName()%>"
+                                    class="food-image">
+
+                            </td>
 
 
-                        <!-- FOOD IMAGE -->
+                            <td class="food-name">
 
-                        <td>
+                                <%=cart.getFoodName()%>
 
-                            <img
-                                src="<%=cart.getImageUrl()%>"
-                                alt="<%=cart.getFoodName()%>"
-                                class="food-image">
-
-                        </td>
+                            </td>
 
 
-                        <!-- FOOD NAME -->
+                            <td class="price">
 
-                        <td class="food-name">
+                                ৳<%=String.format(
+                                    "%.2f",
+                                    cart.getPrice())%>
 
-                            <%=cart.getFoodName()%>
-
-                        </td>
-
-
-                        <!-- PRICE -->
-
-                        <td class="price">
-
-                            ৳<%=String.format(
-                                "%.2f",
-                                cart.getPrice())%>
-
-                        </td>
+                            </td>
 
 
-                        <!-- QUANTITY -->
+                            <td>
 
-                        <td>
+                                <div class="food-action">
 
-                            <div class="food-action">
+                                    <div class="quantity-box">
+
+                                        <!-- MINUS -->
+
+                                        <form
+                                            action="CartServlet"
+                                            method="post">
+
+                                            <input
+                                                type="hidden"
+                                                name="action"
+                                                value="decrease">
+
+                                            <input
+                                                type="hidden"
+                                                name="cartId"
+                                                value="<%=cart.getCartId()%>">
+
+                                            <button
+                                                type="submit"
+                                                class="qty-minus">
+
+                                                −
+
+                                            </button>
+
+                                        </form>
 
 
-                                <!-- QUANTITY BOX -->
+                                        <!-- NUMBER -->
 
-                                <div class="quantity-box">
+                                        <span class="qty-number">
+
+                                            <%=cart.getQuantity()%>
+
+                                        </span>
 
 
-                                    <!-- MINUS -->
+                                        <!-- PLUS -->
+
+                                        <form
+                                            action="CartServlet"
+                                            method="post">
+
+                                            <input
+                                                type="hidden"
+                                                name="action"
+                                                value="increase">
+
+                                            <input
+                                                type="hidden"
+                                                name="cartId"
+                                                value="<%=cart.getCartId()%>">
+
+                                            <button
+                                                type="submit"
+                                                class="qty-plus">
+
+                                                +
+
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+
+
+                                    <!-- REMOVE -->
 
                                     <form
                                         action="CartServlet"
-                                        method="post">
+                                        method="post"
+                                        class="remove-form">
 
                                         <input
                                             type="hidden"
                                             name="action"
-                                            value="decrease">
+                                            value="remove">
 
                                         <input
                                             type="hidden"
@@ -814,148 +960,208 @@
 
                                         <button
                                             type="submit"
-                                            class="qty-minus">
+                                            class="remove-item">
 
-                                            −
-
-                                        </button>
-
-                                    </form>
-
-
-                                    <!-- NUMBER -->
-
-                                    <span class="qty-number">
-
-                                        <%=cart.getQuantity()%>
-
-                                    </span>
-
-
-                                    <!-- PLUS -->
-
-                                    <form
-                                        action="CartServlet"
-                                        method="post">
-
-                                        <input
-                                            type="hidden"
-                                            name="action"
-                                            value="increase">
-
-                                        <input
-                                            type="hidden"
-                                            name="cartId"
-                                            value="<%=cart.getCartId()%>">
-
-                                        <button
-                                            type="submit"
-                                            class="qty-plus">
-
-                                            +
+                                            Remove
 
                                         </button>
 
                                     </form>
-
 
                                 </div>
 
-
-                                <!-- REMOVE -->
-
-                                <form
-                                    action="CartServlet"
-                                    method="post"
-                                    class="remove-form">
-
-                                    <input
-                                        type="hidden"
-                                        name="action"
-                                        value="remove">
-
-                                    <input
-                                        type="hidden"
-                                        name="cartId"
-                                        value="<%=cart.getCartId()%>">
-
-                                    <button
-                                        type="submit"
-                                        class="remove-item">
-
-                                        Remove
-
-                                    </button>
-
-                                </form>
+                            </td>
 
 
-                            </div>
+                            <td class="item-total">
 
-                        </td>
+                                ৳<%=String.format(
+                                    "%.2f",
+                                    itemTotal)%>
 
+                            </td>
 
-                        <!-- ITEM TOTAL -->
+                        </tr>
 
-                        <td class="item-total">
+                    <%
+                        }
+                    %>
 
-                            ৳<%=String.format(
-                                "%.2f",
-                                itemTotal)%>
+                    </tbody>
 
-                        </td>
-
-
-                    </tr>
+                </table>
 
 
                 <%
-
-                    }
-
+                    } else {
                 %>
 
+                    <div class="empty-cart">
 
-                </tbody>
+                        <h2>
+                            Your Cart is Empty
+                        </h2>
 
-            </table>
+                        <p>
+                            You haven't added any food yet.
+                        </p>
 
+                        <a
+                            href="MenuServlet"
+                            class="checkout-btn">
 
-            <%
+                            Browse Menu
 
-                } else {
+                        </a>
 
-            %>
+                    </div>
 
-
-            <!-- ================= EMPTY CART ================= -->
-
-            <div class="empty-cart">
-
-                <h2>
-                    Your Cart is Empty
-                </h2>
-
-                <p>
-                    You haven't added any food yet.
-                </p>
-
-                <a
-                    href="MenuServlet"
-                    class="checkout-btn">
-
-                    Browse Menu
-
-                </a>
+                <%
+                    }
+                %>
 
             </div>
 
 
-            <%
+            <!-- ================= AVAILABLE OFFERS ================= -->
 
-                }
+            <div class="offers-section">
 
-            %>
+                <h2 class="offers-title">
+                    Available Offers
+                </h2>
+
+                <%
+                    if (offerList != null &&
+                        !offerList.isEmpty()) {
+                %>
+
+                    <%
+                        for (Offer offer : offerList) {
+                    %>
+
+                        <div class="offer-card">
+
+                            <h3>
+                                <%=offer.getOfferName()%>
+                            </h3>
+
+                            <p>
+                                <%=offer.getDescription()%>
+                            </p>
+
+                            <p class="discount-text">
+
+                                Discount:
+                                <%=String.format(
+                                    "%.2f",
+                                    offer.getDiscountValue())%>
+
+                                <% if ("PERCENTAGE".equalsIgnoreCase(
+                                        offer.getDiscountType())) { %>
+
+                                    %
+
+                                <% } else { %>
+
+                                    ৳
+
+                                <% } %>
+
+                            </p>
+
+                            <p>
+
+                                Minimum Order:
+                                ৳<%=String.format(
+                                    "%.2f",
+                                    offer.getMinimumOrder())%>
+
+                            </p>
+
+                            <% if (offer.getMaxDiscount() > 0) { %>
+
+                                <p>
+
+                                    Maximum Discount:
+                                    ৳<%=String.format(
+                                        "%.2f",
+                                        offer.getMaxDiscount())%>
+
+                                </p>
+
+                            <% } %>
+
+                            <p>
+
+                                Valid:
+
+                                <%=offer.getStartDate() != null
+                                    ? offer.getStartDate()
+                                    : "Any Date"%>
+
+                                -
+
+                                <%=offer.getEndDate() != null
+                                    ? offer.getEndDate()
+                                    : "No Expiry"%>
+
+                            </p>
+
+
+                            <!-- CLAIM OFFER -->
+
+                            <form
+                                action="CartServlet"
+                                method="post">
+
+                                <input
+                                    type="hidden"
+                                    name="action"
+                                    value="claimOffer">
+
+                                <input
+                                    type="hidden"
+                                    name="offerId"
+                                    value="<%=offer.getOfferId()%>">
+
+                                <button
+                                    type="submit"
+                                    class="claim-btn">
+
+                                    Claim Offer
+
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    <%
+                        }
+                    %>
+
+                <%
+                    } else {
+                %>
+
+                    <div class="offer-card">
+
+                        <h3>
+                            No Active Offers
+                        </h3>
+
+                        <p>
+                            There are currently no active offers available.
+                        </p>
+
+                    </div>
+
+                <%
+                    }
+                %>
+
+            </div>
 
         </div>
 
@@ -988,6 +1194,60 @@
             </div>
 
 
+            <!-- APPLIED OFFER -->
+
+            <% if (appliedOffer != null &&
+                   discountAmount > 0) { %>
+
+                <div class="applied-offer-box">
+
+                    <strong>
+                        Offer Applied
+                    </strong>
+
+                    <p>
+                        <%=appliedOffer.getOfferName()%>
+                    </p>
+
+                </div>
+
+
+                <div class="summary-row discount-row">
+
+                    <span>
+                        Offer Discount
+                    </span>
+
+                    <span>
+
+                        - ৳<%=String.format(
+                            "%.2f",
+                            discountAmount)%>
+
+                    </span>
+
+                </div>
+
+
+                <div class="summary-row">
+
+                    <span>
+                        Discounted Subtotal
+                    </span>
+
+                    <span>
+
+                        ৳<%=String.format(
+                            "%.2f",
+                            discountedSubtotal)%>
+
+                    </span>
+
+                </div>
+
+            <% } %>
+
+
             <!-- DELIVERY -->
 
             <div class="summary-row">
@@ -998,29 +1258,17 @@
 
                 <span>
 
-                    <%
-
-                        if (deliveryCharge == 0) {
-
-                    %>
+                    <% if (deliveryCharge == 0) { %>
 
                         FREE
 
-                    <%
-
-                        } else {
-
-                    %>
+                    <% } else { %>
 
                         ৳<%=String.format(
                             "%.2f",
                             deliveryCharge)%>
 
-                    <%
-
-                        }
-
-                    %>
+                    <% } %>
 
                 </span>
 
@@ -1068,50 +1316,38 @@
             </div>
 
 
-            <%
+            <% if (cartList != null &&
+                   !cartList.isEmpty()) { %>
 
-                if (cartList != null &&
-                    !cartList.isEmpty()) {
+                <div class="button-group">
 
-            %>
+                    <!-- CONTINUE SHOPPING -->
 
+                    <a
+                        href="MenuServlet"
+                        class="continue-btn">
 
-            <div class="button-group">
+                        Continue Shopping
 
-
-                <!-- CONTINUE SHOPPING -->
-
-                <a
-                    href="MenuServlet"
-                    class="continue-btn">
-
-                    Continue Shopping
-
-                </a>
+                    </a>
 
 
-                <!-- CHECKOUT -->
+                    <!-- CHECKOUT -->
 
-                <a
-                    href="CheckoutServlet"
-                    class="checkout-btn">
+                    <a
+                        href="CheckoutServlet"
+                        class="checkout-btn">
 
-                    Proceed to Place Order
+                        Proceed to Place Order
 
-                </a>
+                    </a>
 
+                </div>
 
-            </div>
-
-
-            <%
-
-                }
-
-            %>
+            <% } %>
 
 
-            <!-- OFFER -->
+            <!-- FREE DELIVERY -->
 
             <div class="offer">
 
@@ -1139,9 +1375,6 @@
 
     <div class="footer-container">
 
-
-        <!-- FOOD EXPRESS -->
-
         <div class="footer-box">
 
             <h3>
@@ -1155,8 +1388,6 @@
 
         </div>
 
-
-        <!-- QUICK LINKS -->
 
         <div class="footer-box">
 
@@ -1182,8 +1413,6 @@
 
         </div>
 
-
-        <!-- CONTACT -->
 
         <div class="footer-box">
 

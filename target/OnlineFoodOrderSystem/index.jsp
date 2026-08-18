@@ -29,23 +29,55 @@
 
     <ul class="nav-links">
 
-        <li><a href="index.jsp">Home</a></li>
+        <li>
+            <a href="index.jsp">
+                Home
+            </a>
+        </li>
 
-        <li><a href="menu.jsp">Menu</a></li>
+        <li>
+            <a href="menu.jsp">
+                Menu
+            </a>
+        </li>
 
-        <li><a href="offers.jsp">Offers</a></li>
+        <li>
+            <a href="offers.jsp">
+                Offers
+            </a>
+        </li>
 
-        <li><a href="about.jsp">About</a></li>
+        <li>
+            <a href="about.jsp">
+                About
+            </a>
+        </li>
 
-        <li><a href="contact.jsp">Contact</a></li>
+        <li>
+            <a href="login.jsp"
+               class="login-btn">
+                Login
+            </a>
+        </li>
 
-        <li><a href="login.jsp" class="login-btn">Login</a></li>
-        <li><a href="adminLogin.jsp" class="adminLogin-btn">Admin Login</a></li>    
-        <li><a href="register.jsp" class="register-btn">Register</a></li>
+        <li>
+            <a href="adminLogin.jsp"
+               class="adminLogin-btn">
+                Admin Login
+            </a>
+        </li>
+
+        <li>
+            <a href="register.jsp"
+               class="register-btn">
+                Register
+            </a>
+        </li>
 
     </ul>
 
 </nav>
+
 
 <!-- ================= HERO SECTION ================= -->
 
@@ -76,13 +108,15 @@
 
         <div class="hero-buttons">
 
-            <a href="register.jsp" class="primary-btn">
+            <a href="register.jsp"
+               class="primary-btn">
 
                 Order Now
 
             </a>
 
-            <a href="menu.jsp" class="secondary-btn">
+            <a href="menu.jsp"
+               class="secondary-btn">
 
                 View Menu
 
@@ -92,14 +126,17 @@
 
     </div>
 
+
     <div class="hero-image">
 
-        <img src="https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg"
-             alt="Food">
+        <img
+            src="https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg"
+            alt="Food">
 
     </div>
 
 </section>
+
 
 <!-- ================= FEATURED MENU ================= -->
 
@@ -117,18 +154,25 @@
 
     </p>
 
+
     <div class="food-container">
+
 
         <div class="food-card">
 
-            <img src="https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg"
-                 alt="Burger">
+            <img
+                src="https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg"
+                alt="Burger">
 
             <div class="food-info">
 
-                <h3>Classic Beef Burger</h3>
+                <h3>
+                    Classic Beef Burger
+                </h3>
 
-                <span class="price">৳450</span>
+                <span class="price">
+                    ৳450
+                </span>
 
                 <p>
 
@@ -147,16 +191,22 @@
 
         </div>
 
+
         <div class="food-card">
 
-            <img src="https://images.pexels.com/photos/825661/pexels-photo-825661.jpeg"
-                 alt="Pizza">
+            <img
+                src="https://images.pexels.com/photos/825661/pexels-photo-825661.jpeg"
+                alt="Pizza">
 
             <div class="food-info">
 
-                <h3>Margherita Pizza</h3>
+                <h3>
+                    Margherita Pizza
+                </h3>
 
-                <span class="price">৳850</span>
+                <span class="price">
+                    ৳850
+                </span>
 
                 <p>
 
@@ -175,16 +225,22 @@
 
         </div>
 
+
         <div class="food-card">
 
-            <img src="https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg"
-                 alt="Pasta">
+            <img
+                src="https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg"
+                alt="Pasta">
 
             <div class="food-info">
 
-                <h3>Chicken Alfredo Pasta</h3>
+                <h3>
+                    Chicken Alfredo Pasta
+                </h3>
 
-                <span class="price">৳780</span>
+                <span class="price">
+                    ৳780
+                </span>
 
                 <p>
 
@@ -203,38 +259,10 @@
 
         </div>
 
-    </div>
-
-</section>
-<!-- ================= SPECIAL OFFERS ================= -->
-
-<section class="offers">
-
-    <div class="offer-box">
-
-        <h2>
-
-            Exclusive Weekend Offer
-
-        </h2>
-
-        <p>
-
-            Get 20% OFF on selected premium dishes every Friday and Saturday.
-            Enjoy delicious meals at special prices.
-
-        </p>
-
-        <a href="offers.jsp" class="primary-btn">
-
-            Explore Offers
-
-        </a>
 
     </div>
 
 </section>
-
 
 
 <!-- ================= WHY CHOOSE US ================= -->
@@ -253,7 +281,9 @@
 
     </p>
 
+
     <div class="features">
+
 
         <div class="feature-card">
 
@@ -271,6 +301,7 @@
 
         </div>
 
+
         <div class="feature-card">
 
             <h3>
@@ -286,6 +317,7 @@
             </p>
 
         </div>
+
 
         <div class="feature-card">
 
@@ -303,6 +335,7 @@
 
         </div>
 
+
         <div class="feature-card">
 
             <h3>
@@ -319,10 +352,10 @@
 
         </div>
 
+
     </div>
 
 </section>
-
 
 
 <!-- ================= CUSTOMER REVIEWS ================= -->
@@ -341,7 +374,9 @@
 
     </p>
 
+
     <div class="review-container">
+
 
         <div class="review-card">
 
@@ -365,6 +400,7 @@
 
         </div>
 
+
         <div class="review-card">
 
             <h3>
@@ -386,6 +422,7 @@
             </p>
 
         </div>
+
 
         <div class="review-card">
 
@@ -409,46 +446,10 @@
 
         </div>
 
-    </div>
-
-</section>
-<!-- ================= NEWSLETTER ================= -->
-
-<section class="newsletter">
-
-    <div class="newsletter-content">
-
-        <h2>
-
-            Stay Updated
-
-        </h2>
-
-        <p>
-
-            Subscribe to receive our latest menu updates, exclusive offers and seasonal discounts.
-
-        </p>
-
-        <form action="#" method="post">
-
-            <input
-                type="email"
-                placeholder="Enter your email"
-                required>
-
-            <button type="submit">
-
-                Subscribe
-
-            </button>
-
-        </form>
 
     </div>
 
 </section>
-
 
 
 <!-- ================= FOOTER ================= -->
@@ -456,6 +457,7 @@
 <footer>
 
     <div class="footer-container">
+
 
         <div class="footer-box">
 
@@ -476,7 +478,6 @@
         </div>
 
 
-
         <div class="footer-box">
 
             <h3>
@@ -485,11 +486,13 @@
 
             </h3>
 
+
             <a href="index.jsp">
 
                 Home
 
             </a>
+
 
             <a href="menu.jsp">
 
@@ -497,11 +500,13 @@
 
             </a>
 
+
             <a href="offers.jsp">
 
                 Offers
 
             </a>
+
 
             <a href="about.jsp">
 
@@ -509,11 +514,6 @@
 
             </a>
 
-            <a href="contact.jsp">
-
-                Contact
-
-            </a>
 
             <a href="login.jsp">
 
@@ -521,47 +521,22 @@
 
             </a>
 
+
             <a href="register.jsp">
 
                 Register
 
             </a>
 
-        </div>
-
-
-
-        <div class="footer-box">
-
-            <h3>
-
-                Contact Information
-
-            </h3>
-
-            <p>
-
-                Email : info@foodexpress.com
-
-            </p>
-
-            <p>
-
-                Phone : +880 1700-123456
-
-            </p>
-
-            <p>
-
-                Address : Sylhet, Bangladesh
-
-            </p>
 
         </div>
+
 
     </div>
 
+
     <hr>
+
 
     <p class="copyright">
 
@@ -570,6 +545,7 @@
     </p>
 
 </footer>
+
 
 </body>
 

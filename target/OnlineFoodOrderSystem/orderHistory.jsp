@@ -58,6 +58,7 @@
 
         }
 
+
         /* ================= NAVBAR ================= */
 
         .navbar {
@@ -116,6 +117,7 @@
             opacity: 0.85;
 
         }
+
 
         /* ================= HERO ================= */
 
@@ -189,6 +191,7 @@
 
         }
 
+
         /* ================= ORDERS SECTION ================= */
 
         .orders-section {
@@ -219,6 +222,7 @@
 
         }
 
+
         /* ================= ORDER CARD ================= */
 
         .order-card {
@@ -248,6 +252,7 @@
                 0 10px 28px rgba(0,0,0,0.10);
 
         }
+
 
         .order-top {
 
@@ -282,6 +287,7 @@
             font-size: 14px;
 
         }
+
 
         /* ================= ORDER DETAILS ================= */
 
@@ -334,6 +340,7 @@
 
         }
 
+
         /* ================= STATUS ================= */
 
         .status {
@@ -382,6 +389,7 @@
 
         }
 
+
         /* ================= PAYMENT ================= */
 
         .paid {
@@ -395,6 +403,34 @@
             color: #b45309;
 
         }
+
+
+        /* ================= TIME DETAILS ================= */
+
+        .time-box {
+
+            background: #eff6ff;
+
+            border: 1px solid #dbeafe;
+
+        }
+
+        .time-label {
+
+            color: #1976d2 !important;
+
+            font-weight: 600;
+
+        }
+
+        .time-value {
+
+            color: #1565c0 !important;
+
+            font-size: 17px !important;
+
+        }
+
 
         /* ================= EMPTY ORDERS ================= */
 
@@ -452,6 +488,7 @@
             background: #1976D2;
 
         }
+
 
         /* ================= FOOTER ================= */
 
@@ -517,6 +554,7 @@
             margin-top: 25px;
 
         }
+
 
         /* ================= MOBILE ================= */
 
@@ -604,6 +642,7 @@
 
     </div>
 
+
     <ul class="nav-links">
 
         <li>
@@ -671,6 +710,7 @@
 
             Hello
             <strong><%=user.getFullName()%></strong>!
+
             Here you can view your previous purchases
             and track the status of your current orders.
 
@@ -714,21 +754,31 @@
 
 
 <%
-    if(orderList != null && !orderList.isEmpty()) {
+
+    if(orderList != null &&
+       !orderList.isEmpty()) {
 
         for(Order order : orderList) {
+
+
+            // ==========================================
+            // ORDER STATUS
+            // ==========================================
 
             String status =
                     order.getOrderStatus();
 
-            if(status == null) {
+            if(status == null ||
+               status.trim().isEmpty()) {
 
                 status = "Pending";
 
             }
 
+
             String statusClass =
                     status.toLowerCase();
+
 
             if(statusClass.equals("preparing")) {
 
@@ -749,14 +799,51 @@
             }
 
 
+            // ==========================================
+            // PAYMENT STATUS
+            // ==========================================
+
             String paymentStatus =
                     order.getPaymentStatus();
 
-            if(paymentStatus == null) {
+            if(paymentStatus == null ||
+               paymentStatus.trim().isEmpty()) {
 
                 paymentStatus = "Pending";
 
             }
+
+
+            // ==========================================
+            // DELIVERY METHOD
+            // ==========================================
+
+            String deliveryMethod =
+                    order.getDeliveryMethod();
+
+            if(deliveryMethod == null ||
+               deliveryMethod.trim().isEmpty()) {
+
+                deliveryMethod = "Not Available";
+
+            }
+
+
+            // ==========================================
+            // PICKUP TIME
+            // ==========================================
+
+            String pickupTime =
+                    order.getPickupTime();
+
+
+            // ==========================================
+            // ESTIMATED DELIVERY TIME
+            // ==========================================
+
+            String estimatedDeliveryTime =
+                    order.getEstimatedDeliveryTime();
+
 %>
 
 
@@ -765,6 +852,9 @@
 ===================================================== -->
 
 <div class="order-card">
+
+
+    <!-- ================= ORDER TOP ================= -->
 
     <div class="order-top">
 
@@ -778,6 +868,7 @@
 
         </div>
 
+
         <div class="order-date">
 
             <%=order.getOrderDate()%>
@@ -786,6 +877,8 @@
 
     </div>
 
+
+    <!-- ================= ORDER DETAILS ================= -->
 
     <div class="order-details">
 
@@ -845,7 +938,7 @@
 
             </span>
 
-            <strong class="<%=paymentStatus.equals("Paid")
+            <strong class="<%=paymentStatus.equalsIgnoreCase("Paid")
                     ? "paid"
                     : "unpaid"%>">
 
@@ -856,7 +949,7 @@
         </div>
 
 
-        <!-- ADDRESS -->
+        <!-- DELIVERY ADDRESS -->
 
         <div class="detail-box">
 
@@ -868,7 +961,8 @@
 
             <strong>
 
-                <%=order.getDeliveryAddress() == null
+                <%=order.getDeliveryAddress() == null ||
+                   order.getDeliveryAddress().trim().isEmpty()
                         ? "Not Available"
                         : order.getDeliveryAddress()%>
 
@@ -877,15 +971,92 @@
         </div>
 
 
+        <!-- DELIVERY METHOD -->
+
+        <div class="detail-box">
+
+            <span>
+
+                Delivery Method
+
+            </span>
+
+            <strong>
+
+                <%=deliveryMethod%>
+
+            </strong>
+
+        </div>
+
+
+        <!-- PICKUP TIME -->
+
+        <%
+            if(pickupTime != null &&
+               !pickupTime.trim().isEmpty()) {
+        %>
+
+        <div class="detail-box time-box">
+
+            <span class="time-label">
+
+                Pickup Time
+
+            </span>
+
+            <strong class="time-value">
+
+                <%=pickupTime%>
+
+            </strong>
+
+        </div>
+
+        <%
+            }
+        %>
+
+
+        <!-- ESTIMATED DELIVERY TIME -->
+
+        <%
+            if(estimatedDeliveryTime != null &&
+               !estimatedDeliveryTime.trim().isEmpty()) {
+        %>
+
+        <div class="detail-box time-box">
+
+            <span class="time-label">
+
+                Estimated Delivery Time
+
+            </span>
+
+            <strong class="time-value">
+
+                <%=estimatedDeliveryTime%>
+
+            </strong>
+
+        </div>
+
+        <%
+            }
+        %>
+
+
     </div>
 
 </div>
 
 
 <%
+
         }
 
     } else {
+
 %>
 
 
@@ -919,8 +1090,11 @@
 
 
 <%
+
     }
+
 %>
+
 
 </section>
 
@@ -933,6 +1107,8 @@
 
     <div class="footer-container">
 
+
+        <!-- FOOD EXPRESS -->
 
         <div class="footer-box">
 
@@ -951,6 +1127,8 @@
 
         </div>
 
+
+        <!-- QUICK LINKS -->
 
         <div class="footer-box">
 
@@ -982,6 +1160,8 @@
 
         </div>
 
+
+        <!-- CONTACT -->
 
         <div class="footer-box">
 

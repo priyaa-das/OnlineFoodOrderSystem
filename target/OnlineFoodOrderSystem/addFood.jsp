@@ -1,41 +1,19 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="com.foodexpress.model.Food"%>
-<%@page import="com.foodexpress.model.User"%>
 
 <%
-    User admin =
-            (User) session.getAttribute("admin");
+    // =====================================================
+    // ADMIN LOGIN CHECK
+    // =====================================================
 
-    if (admin == null) {
+    if (session == null ||
+        session.getAttribute("admin") == null) {
 
         response.sendRedirect("adminLogin.jsp");
-
         return;
     }
-
-    Food food =
-            (Food) request.getAttribute("food");
-
-    Boolean editModeObj =
-            (Boolean) request.getAttribute("editMode");
-
-    boolean editMode =
-            editModeObj != null &&
-            editModeObj;
-
-    String pageTitle =
-            editMode
-            ? "Edit Food"
-            : "Add Food";
-
-    String buttonText =
-            editMode
-            ? "Update Food"
-            : "Add Food";
 %>
 
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
@@ -45,163 +23,260 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title><%=pageTitle%> | FoodExpress</title>
+    <title>Add New Food | FoodExpress</title>
 
     <style>
 
-        body {
+        * {
+            box-sizing: border-box;
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f7ff;
-        }
-
-        .navbar {
-
-            display: flex;
-
-            justify-content: space-between;
-
-            align-items: center;
-
-            padding: 18px 40px;
-
-            background: #0891b2;
-        }
-
-        .logo {
-
-            color: white;
-
-            font-size: 25px;
-
-            font-weight: bold;
-        }
-
-        .nav-links {
-
-            list-style: none;
-
-            display: flex;
-
-            gap: 20px;
-
-            margin: 0;
-
             padding: 0;
         }
 
-        .nav-links a {
-
-            color: white;
-
-            text-decoration: none;
-
-            padding: 10px 16px;
-
-            border-radius: 6px;
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4faff;
+            color: #263238;
         }
 
-        .dashboard {
+        /* ================= NAVBAR ================= */
 
-            padding: 40px;
-        }
-
-        .form-container {
-
-            max-width: 650px;
-
-            margin: 20px auto;
-
+        .navbar {
+            height: 72px;
             background: white;
 
-            padding: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
 
-            border-radius: 12px;
+            padding: 0 6%;
 
             box-shadow:
-                0 4px 15px rgba(0,0,0,0.08);
+                0 2px 12px rgba(70,130,180,0.10);
+
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
-        h1 {
+        .logo {
+            text-decoration: none;
+            color: #4da6d8;
+            font-size: 25px;
+            font-weight: 800;
+        }
 
-            color: #1e293b;
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
 
-            text-align: center;
+        .nav-links a {
+            text-decoration: none;
+            color: #455a64;
+            font-size: 14px;
+            font-weight: 600;
+        }
 
-            margin-bottom: 30px;
+        .nav-links a:hover {
+            color: #3b9ac4;
+        }
+
+        /* ================= PAGE ================= */
+
+        .container {
+            width: 92%;
+            max-width: 850px;
+            margin: 45px auto 60px;
+        }
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+        .page-header h1 {
+            font-size: 30px;
+            color: #263238;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: #78909c;
+            font-size: 14px;
+        }
+
+        /* ================= FORM CARD ================= */
+
+        .form-card {
+            background: white;
+            border-radius: 16px;
+            padding: 35px;
+
+            box-shadow:
+                0 6px 25px rgba(70,130,180,0.10);
+
+            border: 1px solid #e3f0f7;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
         }
 
         label {
-
-            display: block;
-
-            margin-bottom: 8px;
-
-            font-weight: bold;
-
-            color: #334155;
+            font-size: 13px;
+            font-weight: 700;
+            color: #455a64;
+            margin-bottom: 7px;
         }
 
         input,
-        textarea,
-        select {
+        select,
+        textarea {
 
             width: 100%;
 
+            border: 1px solid #cfe5ef;
+
+            border-radius: 8px;
+
             padding: 12px;
 
-            margin-bottom: 20px;
+            background: white;
 
-            border: 1px solid #cbd5e1;
+            color: #37474f;
 
-            border-radius: 6px;
+            font-size: 14px;
 
-            box-sizing: border-box;
+            outline: none;
 
-            font-size: 15px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        input,
+        select {
+            height: 44px;
         }
 
         textarea {
-
+            min-height: 120px;
             resize: vertical;
         }
 
+        input:focus,
+        select:focus,
+        textarea:focus {
+
+            border-color: #66b9df;
+
+            box-shadow:
+                0 0 0 3px rgba(
+                    102,
+                    185,
+                    223,
+                    0.12
+                );
+        }
+
+        .hint {
+            margin-top: 6px;
+            color: #90a4ae;
+            font-size: 11px;
+        }
+
+        /* ================= ACTIONS ================= */
+
+        .form-actions {
+            margin-top: 30px;
+
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
         .btn {
-
-            display: inline-block;
-
-            padding: 12px 25px;
-
             border: none;
+            border-radius: 8px;
 
-            border-radius: 6px;
+            padding: 12px 24px;
 
-            background: #0891b2;
+            font-size: 14px;
+            font-weight: 700;
 
-            color: white;
-
-            font-size: 15px;
+            text-decoration: none;
 
             cursor: pointer;
         }
 
-        .btn:hover {
-
-            background: #0e7490;
-        }
-
         .cancel-btn {
-
-            background: #64748b;
-
-            text-decoration: none;
-
-            margin-left: 10px;
+            background: #edf5f9;
+            color: #4f6b78;
         }
 
         .cancel-btn:hover {
+            background: #dfeef5;
+        }
 
-            background: #475569;
+        .add-btn {
+            background: #5aaed6;
+            color: white;
+        }
+
+        .add-btn:hover {
+            background: #4299c3;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 700px) {
+
+            .navbar {
+                padding: 0 20px;
+            }
+
+            .nav-links {
+                gap: 12px;
+            }
+
+            .nav-links a {
+                font-size: 11px;
+            }
+
+            .container {
+                width: 94%;
+            }
+
+            .form-card {
+                padding: 25px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full {
+                grid-column: auto;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
         }
 
     </style>
@@ -210,188 +285,255 @@
 
 <body>
 
+
+<!-- ================= NAVBAR ================= -->
+
 <nav class="navbar">
 
-    <div class="logo">
-        FoodExpress Admin
+    <a href="adminDashboard.jsp"
+       class="logo">
+        FoodExpress
+    </a>
+
+    <div class="nav-links">
+
+        <a href="adminDashboard.jsp">
+            Dashboard
+        </a>
+
+        <a href="ManageOrderServlet">
+            Manage Orders
+        </a>
+
+        <a href="ManageOfferServlet">
+            Manage Offers
+        </a>
+
+        <a href="LogoutServlet">
+            Logout
+        </a>
+
     </div>
-
-    <ul class="nav-links">
-
-        <li>
-            <a href="adminDashboard.jsp">
-                Dashboard
-            </a>
-        </li>
-
-        <li>
-            <a href="AdminFoodServlet">
-                Manage Food
-            </a>
-        </li>
-
-        <li>
-            <a href="LogoutServlet">
-                Logout
-            </a>
-        </li>
-
-    </ul>
 
 </nav>
 
 
-<section class="dashboard">
+<!-- ================= MAIN ================= -->
 
-    <div class="form-container">
+<div class="container">
+
+    <div class="page-header">
 
         <h1>
-            <%=pageTitle%>
+            Add New Food
         </h1>
 
+        <p>
+            Add a new food item to the FoodExpress menu.
+        </p>
+
+    </div>
+
+
+    <div class="form-card">
 
         <form
-            action="<%= editMode
-                    ? "EditFoodServlet"
-                    : "AddFoodServlet" %>"
+            action="AddFoodServlet"
             method="post">
 
 
-            <% if (editMode) { %>
-
-                <input
-                    type="hidden"
-                    name="foodId"
-                    value="<%=food.getFoodId()%>">
-
-            <% } %>
+            <div class="form-grid">
 
 
-            <label>
-                Category ID
-            </label>
+                <!-- ================= FOOD NAME ================= -->
 
-            <input
-                type="number"
-                name="categoryId"
-                required
-                value="<%= editMode
-                        ? food.getCategoryId()
-                        : "" %>">
+                <div class="form-group">
 
+                    <label for="foodName">
+                        Food Name
+                    </label>
 
-            <label>
-                Food Name
-            </label>
+                    <input
+                        type="text"
+                        id="foodName"
+                        name="foodName"
+                        placeholder="Enter food name"
+                        required
+                    >
 
-            <input
-                type="text"
-                name="foodName"
-                required
-                value="<%= editMode
-                        ? food.getFoodName()
-                        : "" %>">
+                </div>
 
 
-            <label>
-                Description
-            </label>
+                <!-- ================= CATEGORY ================= -->
 
-            <textarea
-                name="description"
-                rows="4"
-                required><%= editMode
-                    ? food.getDescription()
-                    : "" %></textarea>
+                <div class="form-group">
 
+                    <label for="categoryId">
+                        Category
+                    </label>
 
-            <label>
-                Price
-            </label>
+                    <select
+                        id="categoryId"
+                        name="categoryId"
+                        required
+                    >
 
-            <input
-                type="number"
-                name="price"
-                step="0.01"
-                min="0"
-                required
-                value="<%= editMode
-                        ? food.getPrice()
-                        : "" %>">
+                        <option value="">
+                            -- Select Category --
+                        </option>
 
+                        <option value="1">
+                            🍔 Burger
+                        </option>
 
-            <label>
-                Image URL
-            </label>
+                        <option value="2">
+                            🍕 Pizza
+                        </option>
 
-            <input
-                type="text"
-                name="imageUrl"
-                placeholder="Enter image URL"
-                value="<%= editMode
-                        ? food.getImageUrl()
-                        : "" %>">
+                        <option value="3">
+                            🍝 Pasta
+                        </option>
 
+                        <option value="4">
+                            🥩 Steak
+                        </option>
 
-            <label>
-                Status
-            </label>
+                        <option value="5">
+                            🦞 Seafood
+                        </option>
 
-            <select
-                name="status"
-                required>
+                        <option value="6">
+                            🍰 Dessert
+                        </option>
 
-                <option
-                    value="Available"
-                    <%= editMode &&
-                        "Available".equals(
-                            food.getStatus()
-                        )
-                        ? "selected"
-                        : "" %>>
+                        <option value="7">
+                            🥤 Beverages
+                        </option>
 
-                    Available
+                    </select>
 
-                </option>
-
-                <option
-                    value="Unavailable"
-                    <%= editMode &&
-                        "Unavailable".equals(
-                            food.getStatus()
-                        )
-                        ? "selected"
-                        : "" %>>
-
-                    Unavailable
-
-                </option>
-
-            </select>
+                </div>
 
 
-            <button
-                type="submit"
-                class="btn">
+                <!-- ================= PRICE ================= -->
 
-                <%=buttonText%>
+                <div class="form-group">
 
-            </button>
+                    <label for="price">
+                        Price (৳)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="price"
+                        name="price"
+                        placeholder="Enter price"
+                        min="0"
+                        step="0.01"
+                        required
+                    >
+
+                </div>
 
 
-            <a
-                href="AdminFoodServlet"
-                class="btn cancel-btn">
+                <!-- ================= STATUS ================= -->
 
-                Cancel
+                <div class="form-group">
 
-            </a>
+                    <label for="status">
+                        Status
+                    </label>
+
+                    <select
+                        id="status"
+                        name="status"
+                        required
+                    >
+
+                        <option value="Available">
+                            Available
+                        </option>
+
+                        <option value="Unavailable">
+                            Unavailable
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- ================= DESCRIPTION ================= -->
+
+                <div class="form-group full">
+
+                    <label for="description">
+                        Description
+                    </label>
+
+                    <textarea
+                        id="description"
+                        name="description"
+                        placeholder="Write a short description of the food..."
+                        required
+                    ></textarea>
+
+                </div>
+
+
+                <!-- ================= IMAGE URL ================= -->
+
+                <div class="form-group full">
+
+                    <label for="imageUrl">
+                        Image URL
+                    </label>
+
+                    <input
+                        type="url"
+                        id="imageUrl"
+                        name="imageUrl"
+                        placeholder="https://example.com/food.jpg"
+                        required
+                    >
+
+                    <span class="hint">
+                        Use a direct image URL.
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- ================= BUTTONS ================= -->
+
+            <div class="form-actions">
+
+                <a
+                    href="adminDashboard.jsp"
+                    class="btn cancel-btn"
+                >
+                    Cancel
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn add-btn"
+                >
+                    Add Food
+                </button>
+
+            </div>
+
 
         </form>
 
     </div>
 
-</section>
+</div>
+
 
 </body>
 
